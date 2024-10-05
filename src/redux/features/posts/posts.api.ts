@@ -9,8 +9,17 @@ const postsApi = baseApi.injectEndpoints({
                     method: "GET"
                 }
             }
-        })
+        }),
+        getSinglePost: builder.query({
+            query: ({ id, token }) => ({
+                url: `post/${id}`,
+                method: "GET",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            }),
+        }),
     })
 })
 
-export const {useGetAllPostQuery} = postsApi
+export const {useGetAllPostQuery, useGetSinglePostQuery} = postsApi

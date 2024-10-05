@@ -1,11 +1,12 @@
 "use client";
-import { useGetSinglePostQuery } from '@/redux/features/posts/posts.api';
-import React from 'react';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import 'swiper/css';
-import 'swiper/css/pagination';
+import { useGetSinglePostQuery } from "@/redux/features/posts/posts.api";
+import React from "react";
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/css";
+import "swiper/css/pagination";
 
-import { Pagination } from 'swiper/modules';
+import { Pagination } from "swiper/modules";
+import Image from "next/image";
 
 type TParams = {
   params: {
@@ -28,18 +29,28 @@ const PostDetails = ({ params }: TParams) => {
   }
 
   const singlePostData = data?.data || {};
-  const { title, content, images, tags, category, upvotes, downvotes } = singlePostData;
+  const { title, content, images, tags, category, upvotes, downvotes, author } =
+    singlePostData;
 
   return (
-    <div className='max-w-7xl mx-auto p-5'>
-      <h1 className='text-3xl font-bold mb-5'>{title}</h1>
+    <div className="max-w-7xl mx-auto p-5">
+      <div className="mb-4">
+        <h1 className="text-3xl font-bold mb-3">{title} </h1>
+        <span>
+          <i>
+            --by <b>{author.name}</b>
+          </i>
+        </span>
+      </div>
 
       <Swiper pagination={true} modules={[Pagination]} className="mySwiper">
         {images?.map((image: string, index: number) => (
           <SwiperSlide key={index}>
-            <img
+            <Image
               src={image}
               alt={`Post image ${index + 1}`}
+              width={500}
+              height={100}
               style={{ width: "100%", height: "auto", objectFit: "cover" }}
             />
           </SwiperSlide>
@@ -48,13 +59,14 @@ const PostDetails = ({ params }: TParams) => {
 
       <div dangerouslySetInnerHTML={{ __html: content }} />
       <div>
-        <strong>Tags:</strong> {tags?.join(', ')}
+        <strong>Tags:</strong> {tags?.join(", ")}
       </div>
       <div>
         <strong>Category:</strong> {category}
       </div>
       <div>
-        <strong>Upvotes:</strong> {upvotes} | <strong>Downvotes:</strong> {downvotes}
+        <strong>Upvotes:</strong> {upvotes} | <strong>Downvotes:</strong>{" "}
+        {downvotes}
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-type TAuthor = {
+export type TAuthor = {
   _id: string;
   name: string;
   email: string;

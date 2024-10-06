@@ -48,7 +48,7 @@ const AllPosts = () => {
   };
 
   return (
-    <div className="grid gap-6 justify-center mt-5">
+    <div className="grid gap-6 justify-center mt-8">
       {data.data.map((post: IPost) => {
         const userVote = getUserVoteStatus(post.voters); 
 

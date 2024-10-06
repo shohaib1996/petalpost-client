@@ -1,12 +1,13 @@
 import React from "react";
 import AllPosts from "../AllPosts/AllPosts";
-import Navbar from "../sharedComponents/Navbar/Navbar";
+import AddPost from "../AddPost/AddPost";
 
 
 
 const HomePage = () => {
   return (
     <div>
+      <AddPost></AddPost>
       <AllPosts></AllPosts>
     </div>
   );

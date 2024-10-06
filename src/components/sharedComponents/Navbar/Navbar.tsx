@@ -7,14 +7,13 @@ import { usePathname } from "next/navigation"; // Use next/navigation instead
 import Link from "next/link";
 
 const Navbar = () => {
-  const pathname = usePathname(); // Get the current path
+  const pathname = usePathname();
 
-  // A utility function to check if a link is active
   const isActive = (path: string) => pathname === path;
 
   return (
-    <div className=" bg-[#2DA64D]">
-      <div className="navbar max-w-7xl mx-auto">
+    <div className="bg-[#2DA64D] fixed top-0 left-0 right-0 z-10 w-full">
+      <div className="navbar max-w-7xl mx-auto ">
         <div className="navbar-start">
           <div className="dropdown">
             <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
@@ -72,7 +71,6 @@ const Navbar = () => {
                 <IoIosPeople className="text-white text-2xl w-full mx-auto" />
               </li>
             </Link>
-            
           </ul>
         </div>
         <div className="navbar-end">

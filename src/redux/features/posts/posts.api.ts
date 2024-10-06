@@ -19,7 +19,26 @@ const postsApi = baseApi.injectEndpoints({
                 },
             }),
         }),
+        upvoteDownvote: builder.mutation({
+            query: ({ id, token, vote }) => ({
+                url: `post/${id}/vote`,
+                method: "POST",
+                body: vote,
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            }),
+        }),
+        getCommentByPostId: builder.query({
+            query: ({ id, token }) => ({
+                url: `post/${id}/comments`,
+                method: "GET",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            }),
+        })
     })
 })
 
-export const {useGetAllPostQuery, useGetSinglePostQuery} = postsApi
+export const {useGetAllPostQuery, useGetSinglePostQuery, useUpvoteDownvoteMutation,useGetCommentByPostIdQuery} = postsApi

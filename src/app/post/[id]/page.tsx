@@ -65,8 +65,7 @@ const PostDetails = ({ params }: TParams) => {
         <strong>Category:</strong> {category}
       </div>
       <div>
-        <strong>Upvotes:</strong> {upvotes} | <strong>Downvotes:</strong>{" "}
-        {downvotes}
+        <strong>Upvotes:</strong> {upvotes} | <strong>Downvotes:</strong>{downvotes}
       </div>
     </div>
   );

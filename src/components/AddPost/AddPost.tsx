@@ -1,11 +1,14 @@
-import React from 'react'
+import Link from "next/link";
 
 const AddPost = () => {
+  
   return (
     <div className="max-w-[810px] mx-auto mt-24">
-        <button className="btn  w-full">Wide</button>
+      <Link href="/addPost"><button className="btn  w-full">
+        Whats on you mind?
+      </button> </Link>
     </div>
-  )
-}
+  );
+};
 
-export default AddPost
+export default AddPost;

@@ -1,95 +1,91 @@
 "use client";
 
 import React, { useState } from "react";
-
 import dynamic from "next/dynamic";
 import "react-quill/dist/quill.snow.css";
 import { useAddPostMutation } from "@/redux/features/posts/posts.api";
+import { useUploadImageMutation } from "@/redux/features/uploadImage/uploadImage.api";
 import toast from "react-hot-toast";
-import UploadImageComponent from "@/components/UploadImage/UploadImageComponent";
 
 const QuillEditor = dynamic(() => import("react-quill"), { ssr: false });
 
+// const getErrorMessage = () => {
+//   if (error && 'data' in error) {
+//     return (error.data as any)?.message || "Error uploading image.";
+//   }
+//   return "An unexpected error occurred.";
+// };
+
 const AddPost = () => {
-  const token = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2ZmFlMTliMmJjZTAzNzU3MzA0M2NmMyIsImVtYWlsIjoiam9obmF0aG9uLmRvZUBleGFtcGxlLmNvbSIsInJvbGUiOiJ1c2VyIiwibmFtZSI6IkpvbmF0aG9uIHVwZGF0ZTIiLCJpYXQiOjE3MjgxNTk4NDcsImV4cCI6MTcyODI0NjI0N30.CBeaCBGF9afZijZp_FMYqnanC8EZAfb_iCIbofe0PW4`;
+  const token = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2ZmFlMTliMmJjZTAzNzU3MzA0M2NmMyIsImVtYWlsIjoiam9obmF0aG9uLmRvZUBleGFtcGxlLmNvbSIsInJvbGUiOiJ1c2VyIiwibmFtZSI6IkpvbmF0aG9uIHVwZGF0ZTIiLCJpYXQiOjE3MjgyNTc2ODIsImV4cCI6MTcyODM0NDA4Mn0.E5mZ7vB_XzRL95prJutDF4ocQTpoSufuTU0fQcyNjeI`;
   const userId = `66fae19b2bce037573043cf3`;
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [tags, setTags] = useState<string[]>([]);
+  const [file, setFile] = useState<File | null>(null);
+  const [imgLink, setImageLink] = useState("");
   const [addPost] = useAddPostMutation();
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [imageLink, setImageLink] = useState("");
+  const [uploadImage, { isLoading, isSuccess, isError, error }] =
+    useUploadImageMutation();
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files ? event.target.files[0] : null;
-    setSelectedFile(file);
-  };
-  console.log(selectedFile);
-
-  const handleAddPost = async () => {
-    if (!selectedFile) {
-      toast.error("Please upload a file");
-      return;
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setFile(e.target.files[0]);
     }
+  };
 
-    // Create FormData and append file
+  const handleUpload = async () => {
+    if (!file) return toast.error("No file");
+
     const formData = new FormData();
-    formData.append("image", selectedFile);
-
-    // Debugging FormData
-    console.log("FormData before sending:", formData);
-
-    // Log all formData values for debugging
-    formData.forEach((value, key) => {
-      console.log(key, value);
-    });
+    formData.append("image", file);
 
     try {
-      const response = await fetch("https://api.imgur.com/3/image", {
-        method: "POST",
-        body: formData,
-        headers: {
-          Authorization: "Client-ID c8855cbec28058a",
-        },
-      });
-
-      if (!response.ok) {
-        return toast.error("File upload failed");
+      const res = await uploadImage({ data: formData }).unwrap();
+      if (res.success === true) {
+        toast.success("Image uploaded successfully");
+        setImageLink(res.data.link); // Store the image link
       }
-
-      const data = await response.json();
-      console.log("File uploaded successfully:", data);
-    } catch (error) {
-      console.error("Error uploading file:", error);
+    } catch (err) {
+      toast.error("Upload failed");
+      console.error("Upload failed:", err);
     }
+  };
 
-    // console.log(content);
-    // const data = {
-    //   title,
-    //   content,
-    //   author: userId,
-    //   images: [
-    //     "https://media.istockphoto.com/id/1134719594/photo/gardening-tools-and-flowers-on-soil.jpg?s=612x612&w=0&k=20&c=63VLWD2WXDI2-aGt3Txb6MR-B0q1twdo5LiAFRfovgQ=",
-    //   ],
-    //   tags: ["Gardening", "Tips", "Plants", "Horticulture"],
-    //   category: "Gardening",
-    //   upvotes: 0,
-    //   downvotes: 0,
-    //   isPremium: false,
-    //   voters: [],
-    // };
-    // try {
-    //   const res = await addPost({ data, token });
-    //   console.log(res);
-    // } catch (error) {
-    //   console.log(error);
-    // }
+  const handleAddPost = async () => {
+    const data = {
+      title,
+      content,
+      author: userId,
+      images: imgLink ? [imgLink] : [], 
+      tags,
+      category: "Gardening",
+      upvotes: 0,
+      downvotes: 0,
+      isPremium: false,
+      voters: [],
+    };
+    try {
+      const res = await addPost({ data, token });
+      console.log(res);
+      if(res.data.success === true){
+        toast.success("Post created successfully")
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleTagsChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    const tagArray = value.split(",").map((tag) => tag.trim());
+    setTags(tagArray);
   };
 
   const modules = {
     toolbar: [
       ["bold", "italic", "underline", "strike"],
       ["blockquote", "code-block"],
-
       [{ header: 1 }, { header: 2 }],
       [{ list: "ordered" }, { list: "bullet" }, { list: "check" }],
       [{ script: "sub" }, { script: "super" }],
@@ -98,14 +94,13 @@ const AddPost = () => {
       ["link", "image", "video", "formula"],
       [{ size: ["small", false, "large", "huge"] }],
       [{ header: [1, 2, 3, 4, 5, 6, false] }],
-
       [{ color: [] }, { background: [] }],
       [{ font: [] }],
       [{ align: [] }],
-
       ["clean"],
     ],
   };
+
   const formats = [
     "bold",
     "italic",
@@ -137,45 +132,56 @@ const AddPost = () => {
         placeholder="Type here"
         className="input input-bordered w-full max-w-full mb-5 mt-2"
       />
-      {/* <div className="mb-5">
+
+      <div>
         <label className="">
-          Uploead Thumbnail <span className="text-red-400">*</span>
+          Upload Thumbnail <span className="text-red-400">*</span>
         </label>
         <br />
         <input
-          required
+          className="file-input file-input-bordered w-full max-w-xs mb-5 mt-3 mr-5"
           type="file"
-          className="file-input w-full max-w-xs mt-4"
           onChange={handleFileChange}
         />
-      </div> */}
-      <UploadImageComponent/>
-      <label>
-        Content <span className="text-red-400">*</span>
-      </label>
-
-      <div className="mb-20">
-        <QuillEditor
-          value={content}
-          onChange={setContent}
-          modules={modules}
-          formats={formats}
-          style={{ height: "350px" }}
-        />
+        <button
+          className="btn btn-sm btn-outline btn-success"
+          onClick={handleUpload}
+          disabled={isLoading}
+        >
+          {isLoading ? (
+            <span className="loading loading-spinner"></span>
+          ) : (
+            "Upload Image"
+          )}
+        </button>
+        {isSuccess && <p>Image uploaded successfully!</p>}
+        {isError && <p>Error uploading</p>}
       </div>
 
-      <div className="lg:pt-0 pt-16">
+      <div>
+        <label className="">
+          Content <span className="text-red-400">*</span>
+        </label>
+        <div className="mb-20 mt-2">
+          <QuillEditor
+            value={content}
+            onChange={setContent}
+            modules={modules}
+            formats={formats}
+            style={{ height: "350px" }}
+          />
+        </div>
+      </div>
+      <div>
         <label className="">
           Tags:<span className="text-red-400">*</span>{" "}
         </label>
         <input
           required
           type="text"
-          placeholder="Ex - Gardening,
-            Tips,
-            Plants,
-            Horticulture"
+          placeholder="Ex - Gardening, Tips, Plants, Horticulture"
           className="input input-bordered w-full max-w-xl"
+          onChange={handleTagsChange}
         />
       </div>
 

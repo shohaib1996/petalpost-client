@@ -2,7 +2,7 @@ import { baseApi } from "@/redux/api/baseApi";
 
 const postsApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    addPost: builder.query({
+    addPost: builder.mutation({
       query: ({ data, token }) => {
         return {
           url: "/post/create-post",
@@ -58,4 +58,5 @@ export const {
   useGetSinglePostQuery,
   useUpvoteDownvoteMutation,
   useGetCommentByPostIdQuery,
+  useAddPostMutation
 } = postsApi;

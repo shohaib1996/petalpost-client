@@ -2,7 +2,7 @@ import React from 'react'
 
 const Followers = () => {
   return (
-    <div>Followers</div>
+    <div className='mt-24'>Followers</div>
   )
 }
 

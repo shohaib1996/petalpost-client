@@ -53,11 +53,27 @@ const AddPost = () => {
   };
 
   const handleAddPost = async () => {
+    if (!title.trim()) {
+      return toast.error("Title cannot be empty");
+    }
+
+    if (tags.length === 0) {
+      return toast.error("Please add at least one tag");
+    }
+
+    if (!imgLink) {
+      return toast.error("Thumbnail image is required");
+    }
+
+    if (!content.trim()) {
+      return toast.error("Content cannot be empty");
+    }
+
     const data = {
       title,
       content,
       author: userId,
-      images: imgLink ? [imgLink] : [], 
+      images: imgLink ? [imgLink] : [],
       tags,
       category: "Gardening",
       upvotes: 0,
@@ -68,8 +84,11 @@ const AddPost = () => {
     try {
       const res = await addPost({ data, token });
       console.log(res);
-      if(res.data.success === true){
-        toast.success("Post created successfully")
+      if (res.data.success === true) {
+        toast.success("Post created successfully");
+      } else {
+        toast.error("Post is not created");
+        toast.error("In content image size should be within 500kb");
       }
     } catch (error) {
       console.log(error);
@@ -172,7 +191,7 @@ const AddPost = () => {
           />
         </div>
       </div>
-      <div>
+      <div className="lg:p-0 pt-20">
         <label className="">
           Tags:<span className="text-red-400">*</span>{" "}
         </label>

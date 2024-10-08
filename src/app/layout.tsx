@@ -1,9 +1,10 @@
+
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import Providers from "@/redux/Providers";
-import Navbar from "@/components/sharedComponents/Navbar/Navbar";
 import { Toaster } from "react-hot-toast";
+import Navbar from "@/components/sharedComponents/Navbar/Navbar";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -31,7 +32,6 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased `}
       >
-        <Navbar></Navbar>
         <Providers>
           {children}
           <Toaster />

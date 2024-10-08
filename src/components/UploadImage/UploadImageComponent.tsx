@@ -1,9 +1,9 @@
-import AddPost from "@/app/addPost/page";
+
 import { useUploadImageMutation } from "@/redux/features/uploadImage/uploadImage.api";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
-const UploadImageComponent = () => {
+const UploadImageComponent = ({ onImageUpload }: { onImageUpload: (link: string) => void }) => {
   const [imgLink, setImageLink] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [uploadImage, { isLoading, isSuccess, isError, error }] =
@@ -27,6 +27,7 @@ const UploadImageComponent = () => {
       if (res.success === true) {
         toast.success("Image uploaded successfully");
         setImageLink(res.data.link);
+        onImageUpload(res.data.link);
       }
     } catch (err) {
       console.error("Upload failed:", err);
@@ -34,12 +35,8 @@ const UploadImageComponent = () => {
   };
 
   return (
-    <div>
-      <div>
-        <label className="">
-          Uploead Thumbnail <span className="text-red-400">*</span>
-        </label>
-      </div>
+    <div className="flex items-center mb-5 lg:flex-row flex-col gap-5 lg:gap-0">
+     
 
       <input
         className="file-input file-input-bordered w-full max-w-xs mr-5"
@@ -47,7 +44,7 @@ const UploadImageComponent = () => {
         onChange={handleFileChange}
       />
       <button
-        className="btn btn-sm btn-outline btn-success"
+        className="btn btn-sm btn-outline btn-success mr-3"
         onClick={handleUpload}
         disabled={isLoading}
       >
@@ -62,7 +59,6 @@ const UploadImageComponent = () => {
       </button>
       {isSuccess && <p>Upload successful!</p>}
       {isError && <p>Error uploading:</p>}
-
    
     </div>
   );

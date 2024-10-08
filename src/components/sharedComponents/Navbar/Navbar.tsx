@@ -1,15 +1,38 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { FaHome } from "react-icons/fa";
 import { IoIosPeople } from "react-icons/io";
 import { usePathname } from "next/navigation"; // Use next/navigation instead
 import Link from "next/link";
+import { useAppDispatch, useTypedSelector } from "@/redux/hooks/useTypedSelector";
+import Image from "next/image";
+import toast from "react-hot-toast";
+import { Logout } from "@/redux/features/auth/authSlice";
 
 const Navbar = () => {
   const pathname = usePathname();
 
   const isActive = (path: string) => pathname === path;
+
+  const user = useTypedSelector((state) => state.auth.user);
+  const dispatch = useAppDispatch();
+
+  function handleLogOut() {
+    toast.success("Log Out successfully")
+    dispatch(Logout());
+  }
+
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    
+    setIsClient(true);
+  }, []);
+
+  if (!isClient) {
+    return null; 
+  }
 
   return (
     <div className="bg-[#2DA64D] fixed top-0 left-0 right-0 z-10 w-full">
@@ -62,21 +85,62 @@ const Navbar = () => {
         <div className="navbar-center hidden lg:flex">
           <ul className="px-1 flex justify-center items-center gap-32">
             <Link href="/">
-              <li className={isActive("/") ? "border-b-4 border-b-[#9EF01A] w-12 p-2" : ""}>
+              <li
+                className={
+                  isActive("/") ? "border-b-4 border-b-[#9EF01A] w-12 p-2" : ""
+                }
+              >
                 <FaHome className="text-white text-2xl w-full mx-auto" />
               </li>
             </Link>
             <Link href="/followers">
-              <li className={isActive("/followers") ? "border-b-4 border-b-[#9EF01A] w-12 p-2" : ""}>
+              <li
+                className={
+                  isActive("/followers")
+                    ? "border-b-4 border-b-[#9EF01A] w-12 p-2"
+                    : ""
+                }
+              >
                 <IoIosPeople className="text-white text-2xl w-full mx-auto" />
               </li>
             </Link>
           </ul>
         </div>
         <div className="navbar-end">
-          <a className="btn bg-[#70e000] border-0 hover:bg-[#9ef01a]">
-            Join Us
-          </a>
+          {user && user.avatar ? (
+            <div className="dropdown dropdown-end">
+              <div tabIndex={0} role="button" className="">
+                <div className="avatar">
+                  <div className="w-12 rounded-full">
+                    <Image
+                      src={user.avatar}
+                      alt={user.name}
+                      width={48}
+                      height={48}
+                    />
+                  </div>
+                </div>
+              </div>
+              <ul
+                tabIndex={0}
+                className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
+              >
+                <li>
+                  <a>Item 1</a>
+                </li>
+                <li>
+                  <a onClick={handleLogOut}>Logout</a>
+                </li>
+              </ul>
+            </div>
+          ) : (
+            <Link
+              href="/login"
+              className="btn bg-[#70e000] border-0 hover:bg-[#9ef01a]"
+            >
+              Join Us
+            </Link>
+          )}
         </div>
       </div>
     </div>

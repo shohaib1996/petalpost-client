@@ -6,6 +6,8 @@ import "react-quill/dist/quill.snow.css";
 import { useAddPostMutation } from "@/redux/features/posts/posts.api";
 import { useUploadImageMutation } from "@/redux/features/uploadImage/uploadImage.api";
 import toast from "react-hot-toast";
+import { useTypedSelector } from "@/redux/hooks/useTypedSelector";
+
 
 const QuillEditor = dynamic(() => import("react-quill"), { ssr: false });
 
@@ -17,8 +19,10 @@ const QuillEditor = dynamic(() => import("react-quill"), { ssr: false });
 // };
 
 const AddPost = () => {
-  const token = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2ZmFlMTliMmJjZTAzNzU3MzA0M2NmMyIsImVtYWlsIjoiam9obmF0aG9uLmRvZUBleGFtcGxlLmNvbSIsInJvbGUiOiJ1c2VyIiwibmFtZSI6IkpvbmF0aG9uIHVwZGF0ZTIiLCJpYXQiOjE3MjgyNTc2ODIsImV4cCI6MTcyODM0NDA4Mn0.E5mZ7vB_XzRL95prJutDF4ocQTpoSufuTU0fQcyNjeI`;
-  const userId = `66fae19b2bce037573043cf3`;
+  const token = useTypedSelector((state) => state.auth.token);
+
+  const user = useTypedSelector((state) => state.auth.user);
+  const userId = user?.id
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [tags, setTags] = useState<string[]>([]);
@@ -140,77 +144,80 @@ const AddPost = () => {
   ];
 
   return (
-    <div className="max-w-7xl mx-auto mt-24 p-5">
-      <label>
-        Title <span className="text-red-400">*</span>
-      </label>
-      <input
-        required
-        type="text"
-        onChange={(e) => setTitle(e.target.value)}
-        placeholder="Type here"
-        className="input input-bordered w-full max-w-full mb-5 mt-2"
-      />
+    <>
 
-      <div>
-        <label className="">
-          Upload Thumbnail <span className="text-red-400">*</span>
-        </label>
-        <br />
-        <input
-          className="file-input file-input-bordered w-full max-w-xs mb-5 mt-3 mr-5"
-          type="file"
-          onChange={handleFileChange}
-        />
-        <button
-          className="btn btn-sm btn-outline btn-success"
-          onClick={handleUpload}
-          disabled={isLoading}
-        >
-          {isLoading ? (
-            <span className="loading loading-spinner"></span>
-          ) : (
-            "Upload Image"
-          )}
-        </button>
-        {isSuccess && <p>Image uploaded successfully!</p>}
-        {isError && <p>Error uploading</p>}
-      </div>
-
-      <div>
-        <label className="">
-          Content <span className="text-red-400">*</span>
-        </label>
-        <div className="mb-20 mt-2">
-          <QuillEditor
-            value={content}
-            onChange={setContent}
-            modules={modules}
-            formats={formats}
-            style={{ height: "350px" }}
-          />
-        </div>
-      </div>
-      <div className="lg:p-0 pt-20">
-        <label className="">
-          Tags:<span className="text-red-400">*</span>{" "}
+      <div className="max-w-7xl mx-auto mt-24 p-5">
+        <label>
+          Title <span className="text-red-400">*</span>
         </label>
         <input
           required
           type="text"
-          placeholder="Ex - Gardening, Tips, Plants, Horticulture"
-          className="input input-bordered w-full max-w-xl"
-          onChange={handleTagsChange}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="Type here"
+          className="input input-bordered w-full max-w-full mb-5 mt-2"
         />
-      </div>
 
-      <button
-        onClick={handleAddPost}
-        className="btn btn-outline btn-success mt-5"
-      >
-        Create Post
-      </button>
-    </div>
+        <div>
+          <label className="">
+            Upload Thumbnail <span className="text-red-400">*</span>
+          </label>
+          <br />
+          <input
+            className="file-input file-input-bordered w-full max-w-xs mb-5 mt-3 mr-5"
+            type="file"
+            onChange={handleFileChange}
+          />
+          <button
+            className="btn btn-sm btn-outline btn-success"
+            onClick={handleUpload}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <span className="loading loading-spinner"></span>
+            ) : (
+              "Upload Image"
+            )}
+          </button>
+          {isSuccess && <p>Image uploaded successfully!</p>}
+          {isError && <p>Error uploading</p>}
+        </div>
+
+        <div>
+          <label className="">
+            Content <span className="text-red-400">*</span>
+          </label>
+          <div className="mb-20 mt-2">
+            <QuillEditor
+              value={content}
+              onChange={setContent}
+              modules={modules}
+              formats={formats}
+              style={{ height: "350px" }}
+            />
+          </div>
+        </div>
+        <div className="lg:p-0 pt-20">
+          <label className="">
+            Tags:<span className="text-red-400">*</span>{" "}
+          </label>
+          <input
+            required
+            type="text"
+            placeholder="Ex - Gardening, Tips, Plants, Horticulture"
+            className="input input-bordered w-full max-w-xl"
+            onChange={handleTagsChange}
+          />
+        </div>
+
+        <button
+          onClick={handleAddPost}
+          className="btn btn-outline btn-success mt-5"
+        >
+          Create Post
+        </button>
+      </div>
+    </>
   );
 };
 

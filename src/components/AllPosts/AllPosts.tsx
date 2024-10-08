@@ -4,6 +4,7 @@ import {
   useGetAllPostQuery,
   useUpvoteDownvoteMutation,
 } from "@/redux/features/posts/posts.api";
+import { useTypedSelector } from "@/redux/hooks/useTypedSelector";
 import { IPost, TVote } from "@/types/post.type";
 import Image from "next/image";
 import Link from "next/link";
@@ -15,9 +16,10 @@ import { BiUpvote } from "react-icons/bi";
 const AllPosts = () => {
   const { data, isLoading, refetch } = useGetAllPostQuery(undefined);
 
-  const userId = "66fad84283895032f5e6d182"; // current user ID
-  const token =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY2ZmFkODQyODM4OTUwMzJmNWU2ZDE4MiIsImVtYWlsIjoiam9obi5kb2VAZXhhbXBsZS5jb20iLCJyb2xlIjoidXNlciIsIm5hbWUiOiJKb2huIERvZSIsImlhdCI6MTcyODE2OTQ1NCwiZXhwIjoxNzI4MjU1ODU0fQ.7KnTRSgoNS-DeAVSki05j2OvA2eo7yeEyV3_HkfAGQU";
+  const token = useTypedSelector((state) => state.auth.token);
+
+  const user = useTypedSelector((state) => state.auth.user);
+  const userId = user?.id
   const [addVote] = useUpvoteDownvoteMutation();
 
   const stripHtmlTags = (html: string) => {
@@ -31,6 +33,9 @@ const AllPosts = () => {
   }
 
   const handleVote = async (id: string, vote: TVote) => {
+    if(!user){
+      return toast.error("Please login to vote")
+    }
     try {
       const res = await addVote({ id, token, vote });
       if (res.data?.success === true) {
@@ -51,6 +56,9 @@ const AllPosts = () => {
     <div className="grid gap-6 justify-center mt-8">
       {data.data.map((post: IPost) => {
         const userVote = getUserVoteStatus(post.voters); 
+
+        console.log(post.images[0]);
+        
 
         return (
           <div key={post._id} className="card card-compact bg-base-100 shadow-xl">

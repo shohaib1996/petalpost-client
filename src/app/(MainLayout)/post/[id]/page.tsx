@@ -19,12 +19,16 @@ import {
 import toast from "react-hot-toast";
 import { useTypedSelector } from "@/redux/hooks/useTypedSelector";
 
+interface CommentErrorType {
+  status?: number;
+  
+}
+
 type TParams = {
   params: {
     id: string;
   };
 };
-
 
 const PostDetails = ({ params }: TParams) => {
   const [comment, setComment] = useState("");
@@ -38,18 +42,26 @@ const PostDetails = ({ params }: TParams) => {
 
   const user = useTypedSelector((state) => state.auth.user);
 
-  const userId = user?.id
-
-
-  
+  const userId = user?.id;
 
   const { id } = params;
   const { data, isLoading, error } = useGetSinglePostQuery({ id, token });
 
-  const { data: allComments, refetch } = useGetCommentByPostIdQuery(
-    { id, token },
-    { skip: !data }
-  );
+  const {
+    data: allComments,
+    refetch,
+    error: commentError,
+  } = useGetCommentByPostIdQuery({ id, token }, { skip: !data });
+
+  const isCommentErrorWithStatus = (error: any): error is CommentErrorType => {
+    return error && typeof error.status === 'number';
+  };
+  const comments = isCommentErrorWithStatus(commentError) && commentError.status === 404
+    ? [] 
+    : allComments?.data || [];
+
+
+  console.log(commentError);
 
   const [addComment] = useAddCommentMutation();
   const [upComment] = useUpdateCommentMutation();
@@ -123,6 +135,8 @@ const PostDetails = ({ params }: TParams) => {
     }
     try {
       const res = await deleteComment({ postId: id, commentId, token });
+      console.log(res);
+
       if (res.data?.success === true) {
         toast.success("Comment deleted successfully!!");
         refetch();
@@ -135,7 +149,6 @@ const PostDetails = ({ params }: TParams) => {
 
   return (
     <>
-  
       <div className="max-w-7xl mx-auto p-5 mt-24">
         <div className="mb-4">
           <h1 className="text-3xl font-bold mb-3">{title} </h1>
@@ -182,35 +195,39 @@ const PostDetails = ({ params }: TParams) => {
           </button>
         </div>
         <div>
-          {allComments?.data.map((comment: TComment) => (
-            <div key={comment._id} className="chat chat-start">
-              <div className="chat-image avatar">
-                <div className="w-10 rounded-full">
-                  <Image
-                    alt="Tailwind CSS chat bubble component"
-                    src={comment.userId.avatar}
-                    width={50}
-                    height={50}
-                  />
+          {comments.length === 0 ? (
+            <p>No comments yet. Be the first to comment!</p>
+          ) : (
+            comments.map((comment: TComment) => (
+              <div key={comment._id} className="chat chat-start">
+                <div className="chat-image avatar">
+                  <div className="w-10 rounded-full">
+                    <Image
+                      alt="User Avatar"
+                      src={comment.userId.avatar}
+                      width={50}
+                      height={50}
+                    />
+                  </div>
+                </div>
+                <div className="chat-bubble relative">
+                  <p className="p-4">{comment.userId.name}</p>
+                  <p>{comment.comment}</p>
+
+                  <button
+                    onClick={() => {
+                      setShowModal(true);
+                      setCommentId(comment._id);
+                      setCommentedUserId(comment.userId._id);
+                    }}
+                    className="ml-5 absolute top-0 end-2 text-xl font-bold btn btn-sm bg-transparent text-white border-0 hover:bg-transparent"
+                  >
+                    ...
+                  </button>
                 </div>
               </div>
-              <div className="chat-bubble relative">
-                <p className="p-4">{comment.userId.name}</p>
-                <p>{comment.comment}</p>
-
-                <button
-                  onClick={() => {
-                    setShowModal(true),
-                      setCommentId(comment._id),
-                      setCommentedUserId(comment.userId._id);
-                  }}
-                  className="ml-5 absolute top-0 end-2 text-xl font-bold btn btn-sm bg-transparent text-white border-0 hover:bg-transparent"
-                >
-                  ...
-                </button>
-              </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
 
         {showModal && (

@@ -6,6 +6,7 @@ export type TUser = {
   role: string;
   name: string;
   avatar: string;
+  isPremium: boolean,
   iat: number;
   exp: number;
 };
@@ -27,7 +28,7 @@ export const authSlice = createSlice({
       const { user, token } = action.payload;
     //   console.log(action.payload, "payload");
       state.user = user;
-      state.token = token;
+      state.token = token || state.token;;
     },
     Logout: (state) => {
       state.user = null;

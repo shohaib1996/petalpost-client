@@ -5,10 +5,14 @@ import { FaHome } from "react-icons/fa";
 import { IoIosPeople } from "react-icons/io";
 import { usePathname } from "next/navigation"; // Use next/navigation instead
 import Link from "next/link";
-import { useAppDispatch, useTypedSelector } from "@/redux/hooks/useTypedSelector";
+import {
+  useAppDispatch,
+  useTypedSelector,
+} from "@/redux/hooks/useTypedSelector";
 import Image from "next/image";
 import toast from "react-hot-toast";
 import { Logout } from "@/redux/features/auth/authSlice";
+import { MdWorkspacePremium } from "react-icons/md";
 
 const Navbar = () => {
   const pathname = usePathname();
@@ -16,22 +20,22 @@ const Navbar = () => {
   const isActive = (path: string) => pathname === path;
 
   const user = useTypedSelector((state) => state.auth.user);
+
   const dispatch = useAppDispatch();
 
   function handleLogOut() {
-    toast.success("Log Out successfully")
+    toast.success("Log Out successfully");
     dispatch(Logout());
   }
 
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    
     setIsClient(true);
   }, []);
 
   if (!isClient) {
-    return null; 
+    return null;
   }
 
   return (
@@ -78,9 +82,9 @@ const Navbar = () => {
               </li>
             </ul>
           </div>
-          <a className="btn btn-ghost text-xl font-bold text-white">
+          <Link href="/" className="btn btn-ghost text-xl font-bold text-white">
             Petal Post
-          </a>
+          </Link>
         </div>
         <div className="navbar-center hidden lg:flex">
           <ul className="px-1 flex justify-center items-center gap-32">
@@ -110,7 +114,7 @@ const Navbar = () => {
           {user && user.avatar ? (
             <div className="dropdown dropdown-end">
               <div tabIndex={0} role="button" className="">
-                <div className="avatar">
+                <div className="avatar relative">
                   <div className="w-12 rounded-full">
                     <Image
                       src={user.avatar}
@@ -119,6 +123,11 @@ const Navbar = () => {
                       height={48}
                     />
                   </div>
+                  <div>
+                    {user.isPremium === true && (
+                      <MdWorkspacePremium className="text-3xl text-[#FFD700] absolute top-[50%] left-[55%]" />
+                    )}
+                  </div>
                 </div>
               </div>
               <ul
@@ -126,7 +135,10 @@ const Navbar = () => {
                 className="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow"
               >
                 <li>
-                  <a>Item 1</a>
+                  <a>{user?.name}</a>
+                </li>
+                <li>
+                  <Link href="/membership">Premium Membership</Link>
                 </li>
                 <li>
                   <a onClick={handleLogOut}>Logout</a>

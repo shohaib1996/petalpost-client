@@ -20,7 +20,20 @@ const authApi = baseApi.injectEndpoints({
         };
       },
     }),
+
+    userUpdate: builder.mutation({
+      query: ({token, updateInfo}) => {
+        return {
+          url: "auth/user/profile",
+          method: "PUT",
+          body: updateInfo,
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        };
+      },
+    })
   }),
 });
 
-export const { useLoginMutation, useRegisterMutation } = authApi;
+export const { useLoginMutation, useRegisterMutation, useUserUpdateMutation } = authApi;

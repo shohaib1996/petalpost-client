@@ -29,7 +29,7 @@ const AddPost = () => {
   const [file, setFile] = useState<File | null>(null);
   const [imgLink, setImageLink] = useState("");
   const [addPost] = useAddPostMutation();
-  const [uploadImage, { isLoading, isSuccess, isError, error }] =
+  const [uploadImage, { isLoading, isSuccess, isError }] =
     useUploadImageMutation();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {

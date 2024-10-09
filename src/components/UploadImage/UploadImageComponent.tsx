@@ -4,9 +4,9 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 
 const UploadImageComponent = ({ onImageUpload }: { onImageUpload: (link: string) => void }) => {
-  const [imgLink, setImageLink] = useState("");
+
   const [file, setFile] = useState<File | null>(null);
-  const [uploadImage, { isLoading, isSuccess, isError, error }] =
+  const [uploadImage, { isLoading, isSuccess, isError }] =
     useUploadImageMutation();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -26,7 +26,6 @@ const UploadImageComponent = ({ onImageUpload }: { onImageUpload: (link: string)
       console.log(res);
       if (res.success === true) {
         toast.success("Image uploaded successfully");
-        setImageLink(res.data.link);
         onImageUpload(res.data.link);
       }
     } catch (err) {

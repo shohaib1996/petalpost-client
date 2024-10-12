@@ -14,6 +14,9 @@ import toast from "react-hot-toast";
 import { BiDownvote, BiUpvote } from "react-icons/bi";
 import { useInView } from "react-intersection-observer";
 
+import { MdFavoriteBorder } from "react-icons/md";
+import { log } from "console";
+
 const AllPosts = ({ searchQuery }: { searchQuery: string }) => {
   const [page, setPage] = useState(1);
   const [posts, setPosts] = useState<IPost[]>([]);
@@ -30,9 +33,8 @@ const AllPosts = ({ searchQuery }: { searchQuery: string }) => {
   const userId = user?.id;
   const [addVote] = useUpvoteDownvoteMutation();
 
- 
   const { ref: loadMoreRef, inView } = useInView({
-    threshold: 1.0, 
+    threshold: 1.0,
     triggerOnce: false,
   });
 
@@ -105,6 +107,10 @@ const AllPosts = ({ searchQuery }: { searchQuery: string }) => {
     return <div>Loading...</div>;
   }
 
+  const handleAddFavorite = (post: IPost) => {
+    console.log(post, userId);
+  };
+
   return (
     <div className="grid gap-6 justify-center mt-8">
       {posts.map((post: IPost) => {
@@ -115,12 +121,23 @@ const AllPosts = ({ searchQuery }: { searchQuery: string }) => {
             key={post._id}
             className="card card-compact bg-base-100 shadow-xl"
           >
-            <figure>
-              <img
+            <figure className="relative">
+              <Image
                 src={post.images[0] || "https://via.placeholder.com/400"}
                 alt={post.title}
                 className="w-full h-[450px] object-cover"
+                width={500}
+                height={500}
               />
+              <div className="absolute top-[3%] left-[93%]">
+                <button
+                  onClick={() => handleAddFavorite(post)}
+                  className="btn btn-sm bg-slate-300 border-none"
+                >
+                  {" "}
+                  <MdFavoriteBorder className="text-3xl text-purple-700" />
+                </button>
+              </div>
             </figure>
             <div className="card-body">
               <h2 className="card-title">{post.title}</h2>

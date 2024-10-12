@@ -40,8 +40,6 @@ const Followers = () => {
     return <p>Loading....</p>;
   }
 
-  console.log(followers.data);
-  console.log(followings.data);
 
   return (
     <div className="mt-24 max-w-7xl mx-auto">

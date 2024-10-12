@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { FaHome } from "react-icons/fa";
 import { IoIosPeople } from "react-icons/io";
-import { usePathname } from "next/navigation"; // Use next/navigation instead
+import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   useAppDispatch,
@@ -14,8 +14,12 @@ import toast from "react-hot-toast";
 import { Logout } from "@/redux/features/auth/authSlice";
 import { MdWorkspacePremium } from "react-icons/md";
 
+
 const Navbar = () => {
   const pathname = usePathname();
+
+  const [searchQueryStr, setSearchQueryStr] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
 
   const isActive = (path: string) => pathname === path;
 
@@ -38,7 +42,18 @@ const Navbar = () => {
     return null;
   }
 
+
+  const router = useRouter();
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      router.push(`/?search=${searchQueryStr}`); 
+    }
+  };
+  
+
   return (
+    <>
     <div className="bg-[#2DA64D] fixed top-0 left-0 right-0 z-10 w-full">
       <div className="navbar max-w-7xl mx-auto ">
         <div className="navbar-start">
@@ -82,7 +97,10 @@ const Navbar = () => {
               </li>
             </ul>
           </div>
-          <Link href="/" className="btn btn-ghost text-xl font-bold text-white">
+          <Link
+            href="/"
+            className="btn btn-ghost text-base lg:text-xl font-bold text-white"
+          >
             Petal Post
           </Link>
         </div>
@@ -111,6 +129,16 @@ const Navbar = () => {
           </ul>
         </div>
         <div className="navbar-end">
+          <div className="flex items-center">
+            <input
+              type="text"
+              value={searchQueryStr}
+              onChange={(e) => setSearchQueryStr(e.target.value)}
+              onKeyDown={handleKeyDown} 
+              placeholder="Search posts..."
+              className="input input-sm input-bordered w-full max-w-[250px] mr-5"
+            />
+          </div>
           {user && user.avatar ? (
             <div className="dropdown dropdown-end">
               <div tabIndex={0} role="button" className="">
@@ -155,7 +183,12 @@ const Navbar = () => {
           )}
         </div>
       </div>
+      
     </div>
+  
+    </>
+
+
   );
 };
 

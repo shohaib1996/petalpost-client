@@ -9,22 +9,38 @@ import { useTypedSelector } from "@/redux/hooks/useTypedSelector";
 import { IPost, TVote } from "@/types/post.type";
 import Image from "next/image";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { BiDownvote } from "react-icons/bi";
-import { BiUpvote } from "react-icons/bi";
+import { BiDownvote, BiUpvote } from "react-icons/bi";
+import { useInView } from "react-intersection-observer";
 
-const AllPosts = () => {
-  const { data, isLoading, refetch } = useGetAllPostQuery(undefined);
+const AllPosts = ({ searchQuery }: { searchQuery: string }) => {
+  const [page, setPage] = useState(1);
+  const [posts, setPosts] = useState<IPost[]>([]);
+  const { data, isLoading, refetch } = useGetAllPostQuery({
+    searchQuery,
+    page,
+  });
+  const [hasMore, setHasMore] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [followId, setFollowId] = useState("");
-  const [addFollowing] = useAddFollowingMutation()
-
+  const [addFollowing] = useAddFollowingMutation();
   const token = useTypedSelector((state) => state.auth.token);
-
   const user = useTypedSelector((state) => state.auth.user);
   const userId = user?.id;
   const [addVote] = useUpvoteDownvoteMutation();
+
+ 
+  const { ref: loadMoreRef, inView } = useInView({
+    threshold: 1.0, 
+    triggerOnce: false,
+  });
+
+  useEffect(() => {
+    setPosts([]);
+    setPage(1);
+    refetch();
+  }, [searchQuery]);
 
   const stripHtmlTags = (html: string) => {
     const div = document.createElement("div");
@@ -32,9 +48,20 @@ const AllPosts = () => {
     return div.textContent || div.innerText || "";
   };
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
+  useEffect(() => {
+    if (data?.data) {
+      setPosts((prevPosts) => [...prevPosts, ...data.data]);
+      if (data.data.length === 0) {
+        setHasMore(false);
+      }
+    }
+  }, [data]);
+
+  useEffect(() => {
+    if (inView && hasMore && !isLoading) {
+      setPage((prevPage) => prevPage + 1);
+    }
+  }, [inView, hasMore, isLoading]);
 
   const handleVote = async (id: string, vote: TVote) => {
     if (!user) {
@@ -56,35 +83,32 @@ const AllPosts = () => {
     return voter ? voter.vote : 0;
   };
 
-  const handleFollow = async(e: React.FormEvent) => {
+  const handleFollow = async (e: React.FormEvent) => {
     e.preventDefault();
-    // console.log(userId, followId);
     const followData = {
       userId,
-      followingId: followId
-    }
+      followingId: followId,
+    };
     try {
-      const res = await addFollowing({token, followData})
-      console.log(res);
-      
-      if(res.data.success === true){
-        toast.success("You have followed this user")
-        setShowModal(false)
+      const res = await addFollowing({ token, followData });
+      if (res.data.success === true) {
+        toast.success("You have followed this user");
+        setShowModal(false);
       }
     } catch (error) {
-      toast.error("Alreaday followed this user")
-      setShowModal(false)
-
+      toast.error("Already followed this user");
+      setShowModal(false);
     }
-
   };
+
+  if (isLoading && page === 1) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="grid gap-6 justify-center mt-8">
-      {data.data.map((post: IPost) => {
+      {posts.map((post: IPost) => {
         const userVote = getUserVoteStatus(post.voters);
-
-        // console.log(post.images[0]);
 
         return (
           <div
@@ -155,6 +179,13 @@ const AllPosts = () => {
           </div>
         );
       })}
+
+      {/* Loader for infinite scroll */}
+      <div ref={loadMoreRef} className="w-full text-center py-8">
+        {hasMore && <div>Loading more posts...</div>}
+        {!hasMore && <div>No more posts to load.</div>}
+      </div>
+
       {showModal && (
         <dialog id="my_modal_3" className="modal" open>
           <div className="modal-box w-[150px]">

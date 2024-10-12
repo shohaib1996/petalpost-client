@@ -15,13 +15,20 @@ const postsApi = baseApi.injectEndpoints({
       },
     }),
     getAllPost: builder.query({
-      query: () => {
+      query: ({ searchQuery, page }) => {
+
+        console.log(searchQuery, page);
+      
+        const queryString = searchQuery
+          ? `?title=${searchQuery}&page=${page}`
+          : `?page=${page}`;
         return {
-          url: "post/posts",
+          url: `post/posts${queryString}`,
           method: "GET",
         };
       },
     }),
+
     getSinglePost: builder.query({
       query: ({ id, token }) => ({
         url: `post/${id}`,

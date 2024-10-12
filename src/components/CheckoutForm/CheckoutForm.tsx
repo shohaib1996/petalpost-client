@@ -6,6 +6,8 @@ import { useUserUpdateMutation } from "@/redux/features/auth/auth.api";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { setUser } from "@/redux/features/auth/authSlice";
+import { useGetPostByUserIdQuery } from "@/redux/features/posts/posts.api";
+import { IPost } from "@/types/post.type";
 
 const CheckoutForm = ({ price }: { price: number }) => {
   const stripe = useStripe();
@@ -18,11 +20,15 @@ const CheckoutForm = ({ price }: { price: number }) => {
 
   const token = useTypedSelector((state) => state.auth.token);
   const user = useTypedSelector((state) => state.auth.user);
+  const userId = user?.id
 
   const data = useMemo(() => ({ price }), [price]);
 
+
   const [makePayment] = usePaymentMutation();
   const [statusUpdate] = useUserUpdateMutation();
+
+ 
 
   useEffect(() => {
     const createPaymentIntent = async () => {
@@ -42,12 +48,23 @@ const CheckoutForm = ({ price }: { price: number }) => {
     createPaymentIntent();
   }, [makePayment, token, data]);
 
+  const { data: userPosts, isLoading } = useGetPostByUserIdQuery({ userId, token }, {skip: !data});
+  if (isLoading) {
+    return <p>Loading...</p>;
+  }
+
+  const totalUpvote = userPosts.data.reduce((acc: number, curr: IPost ) => acc+curr.upvotes, 0)
+ 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (user?.isPremium === true) {
       return toast.error("You already a premium member");
     }
+    if(totalUpvote < 1){
+      return toast.error("You don't have minimum upvote to get verified")
+    }
+  
 
     if (!stripe || !elements) {
       return;

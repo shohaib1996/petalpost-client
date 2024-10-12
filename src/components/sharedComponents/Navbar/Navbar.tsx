@@ -138,7 +138,7 @@ const Navbar = () => {
                   <Link href="/userProfile">{user?.name}</Link>
                 </li>
                 <li>
-                  <Link href="/membership">Premium Membership</Link>
+                  <Link href="/membership">Get Verified</Link>
                 </li>
                 <li>
                   <a onClick={handleLogOut}>Logout</a>

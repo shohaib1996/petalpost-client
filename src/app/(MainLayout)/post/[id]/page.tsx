@@ -154,7 +154,7 @@ const PostDetails = ({ params }: TParams) => {
           <h1 className="text-3xl font-bold mb-3">{title} </h1>
           <span>
             <i>
-              --by <b>{author.name}</b>
+              --by <b>{author?.name}</b>
             </i>
           </span>
         </div>

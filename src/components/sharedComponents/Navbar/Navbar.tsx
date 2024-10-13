@@ -19,7 +19,6 @@ const Navbar = () => {
   const pathname = usePathname();
 
   const [searchQueryStr, setSearchQueryStr] = useState("");
-  const [searchQuery, setSearchQuery] = useState("");
 
   const isActive = (path: string) => pathname === path;
 

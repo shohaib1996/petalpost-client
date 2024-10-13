@@ -51,7 +51,7 @@ const Followers = () => {
           <h1 className="font-bold text-2xl">Follower User</h1>
           <div>
             {followers?.data.map((follower: Follower) => (
-              <p>{follower.userId.name}</p>
+              <p key={follower._id}>{follower.userId.name}</p>
             ))}
           </div>
         </div>
@@ -59,7 +59,7 @@ const Followers = () => {
           <h1 className="font-bold text-2xl">Following User</h1>
           <div>
             {followings?.data.map((following: FollowingUser) => (
-              <p>{following.name}</p>
+              <p key={following._id}>{following.name}</p>
             ))}
           </div>
         </div>

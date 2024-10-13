@@ -15,7 +15,6 @@ import { BiDownvote, BiUpvote } from "react-icons/bi";
 import { useInView } from "react-intersection-observer";
 
 import { MdFavoriteBorder } from "react-icons/md";
-import { log } from "console";
 
 const AllPosts = ({ searchQuery }: { searchQuery: string }) => {
   const [page, setPage] = useState(1);
@@ -98,6 +97,7 @@ const AllPosts = ({ searchQuery }: { searchQuery: string }) => {
         setShowModal(false);
       }
     } catch (error) {
+      console.log(error)
       toast.error("Already followed this user");
       setShowModal(false);
     }

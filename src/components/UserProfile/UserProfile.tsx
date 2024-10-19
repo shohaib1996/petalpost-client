@@ -5,10 +5,12 @@ import { useTypedSelector } from "@/redux/hooks/useTypedSelector";
 import { IPost } from "@/types/post.type";
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
+import React, { useState } from "react";
 import { BiDownvote, BiUpvote } from "react-icons/bi";
+import ProfileUpdateModal from "../ProfileUpdateModal/ProfileUpdateModal";
 
 const UserProfile = () => {
+  const [showModal, setShowModal] = useState(false)
   const token = useTypedSelector((state) => state.auth.token);
   const user = useTypedSelector((state) => state.auth.user);
   const userId = user?.id;
@@ -18,7 +20,7 @@ const UserProfile = () => {
     return <p>Loading...</p>;
   }
 
-  console.log(data);
+  // console.log(data);
 
   const stripHtmlTags = (html: string) => {
     const div = document.createElement("div");
@@ -39,6 +41,9 @@ const UserProfile = () => {
             Followers and Following
           </button>
         </Link>
+        <button onClick={() => setShowModal(true)} className="btn w-full mt-5 bg-[#2DA64D] hover:bg-green-500 text-white font-bold">
+          Update Profile
+        </button>
       </div>
       <div className="grid grid-cols-1 gap-6">
         {data?.data.map((post: IPost) => (
@@ -89,6 +94,8 @@ const UserProfile = () => {
           </div>
         ))}
       </div>
+
+      <ProfileUpdateModal showModal={showModal} setShowModal={setShowModal}/>
     </div>
   );
 };

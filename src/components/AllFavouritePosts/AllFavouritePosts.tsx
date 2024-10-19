@@ -27,7 +27,7 @@ const AllFavouritePosts = () => {
   }
 
   return (
-    <div className="grid gap-6 justify-center mt-24 mb-10">
+    <div className="grid gap-6 justify-center mt-24 mb-10 p-5 lg:p-0">
       {data?.data.map((post: IPost) => (
         <div key={post._id} className="card card-compact bg-base-100 shadow-xl">
           <figure>

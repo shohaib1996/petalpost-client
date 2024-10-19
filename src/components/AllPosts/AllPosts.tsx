@@ -126,7 +126,7 @@ const AllPosts = ({ searchQuery }: { searchQuery: string }) => {
   };
 
   return (
-    <div className="grid gap-6 justify-center mt-8">
+    <div className="grid gap-6 justify-center mt-8 p-5 lg:p-0" >
       {posts.map((post: IPost) => {
         const userVote = getUserVoteStatus(post.voters);
 
@@ -143,12 +143,11 @@ const AllPosts = ({ searchQuery }: { searchQuery: string }) => {
                 width={500}
                 height={500}
               />
-              <div className="absolute top-[3%] left-[93%]">
+              <div className="absolute top-[3%] lg:left-[90%] left-[80%]">
                 <button
                   onClick={() => handleAddFavorite(post)}
                   className="btn btn-sm bg-slate-300 border-none"
                 >
-                  {" "}
                   <MdFavoriteBorder className="text-3xl text-purple-700" />
                 </button>
               </div>

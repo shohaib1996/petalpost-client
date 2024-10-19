@@ -36,19 +36,24 @@ const followersApi = baseApi.injectEndpoints({
         };
       },
     }),
-    //   deleteComment: builder.mutation({
-    //     query: ({ postId, commentId, token }) => {
-    //       return {
-    //         url: `/post/${postId}/comment/${commentId}`,
-    //         method: "DELETE",
-    //         headers: {
-    //           Authorization: `Bearer ${token}`,
-    //         },
-    //       };
-    //     },
-    //   }),
+    unfollow: builder.mutation({
+      query: ({ token, updatedData }) => {
+        return {
+          url: `user/unfollow`,
+          method: "PUT",
+          body: updatedData,
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        };
+      },
+    }),
   }),
 });
 
-export const { useAddFollowingMutation, useGetFollowersQuery, useGetFollowingsQuery } =
-  followersApi;
+export const {
+  useAddFollowingMutation,
+  useGetFollowersQuery,
+  useGetFollowingsQuery,
+  useUnfollowMutation,
+} = followersApi;

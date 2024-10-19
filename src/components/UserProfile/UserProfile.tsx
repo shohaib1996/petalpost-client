@@ -13,6 +13,7 @@ const UserProfile = () => {
   const user = useTypedSelector((state) => state.auth.user);
   const userId = user?.id;
   const { data, isLoading } = useGetPostByUserIdQuery({ userId, token });
+
   if (isLoading) {
     return <p>Loading...</p>;
   }
@@ -24,10 +25,23 @@ const UserProfile = () => {
     div.innerHTML = html;
     return div.textContent || div.innerText || "";
   };
+
   return (
-    <div className="grid gap-6 justify-center mt-24">
-      {data.data.map((post: IPost) => {
-        return (
+    <div className="grid lg:grid-cols-[3fr_5fr] grid-cols-1 justify-center mt-24 max-w-7xl mx-auto p-5 lg:gap-20 gap-5">
+      <div>
+        <Link href="favourite">
+          <button className="btn w-full bg-[#2DA64D] hover:bg-green-500 text-white font-bold">
+            Favourite Post
+          </button>
+        </Link>
+        <Link href="/followers">
+          <button className="btn w-full mt-5 bg-[#2DA64D] hover:bg-green-500 text-white font-bold">
+            Followers and Following
+          </button>
+        </Link>
+      </div>
+      <div className="grid grid-cols-1 gap-6">
+        {data?.data.map((post: IPost) => (
           <div
             key={post._id}
             className="card card-compact bg-base-100 shadow-xl"
@@ -50,18 +64,12 @@ const UserProfile = () => {
                   Read More
                 </Link>
               </p>
-              <div className="flex">
+              <div className="flex justify-between items-center">
                 <p className="flex items-center gap-3">
-                  Upvotes: {post.upvotes}{" "}
-                  <span>
-                    <BiUpvote />
-                  </span>
+                  Upvotes: {post.upvotes} <BiUpvote />
                 </p>
                 <p className="flex items-center gap-3">
-                  Downvotes: {post.downvotes}{" "}
-                  <span>
-                    <BiDownvote />
-                  </span>
+                  Downvotes: {post.downvotes} <BiDownvote />
                 </p>
                 {post.author && (
                   <div className="flex items-center gap-2 cursor-pointer">
@@ -79,8 +87,8 @@ const UserProfile = () => {
               </div>
             </div>
           </div>
-        );
-      })}
+        ))}
+      </div>
     </div>
   );
 };

@@ -15,6 +15,7 @@ import { BiDownvote, BiUpvote } from "react-icons/bi";
 import { useInView } from "react-intersection-observer";
 
 import { MdFavoriteBorder } from "react-icons/md";
+import { useAddFavouriteMutation } from "@/redux/features/favourite/favourite.api";
 
 const AllPosts = ({ searchQuery }: { searchQuery: string }) => {
   const [page, setPage] = useState(1);
@@ -23,6 +24,7 @@ const AllPosts = ({ searchQuery }: { searchQuery: string }) => {
     searchQuery,
     page,
   });
+  const [addFavourite] = useAddFavouriteMutation();
   const [hasMore, setHasMore] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [followId, setFollowId] = useState("");
@@ -97,7 +99,7 @@ const AllPosts = ({ searchQuery }: { searchQuery: string }) => {
         setShowModal(false);
       }
     } catch (error) {
-      console.log(error)
+      console.log(error);
       toast.error("Already followed this user");
       setShowModal(false);
     }
@@ -107,8 +109,20 @@ const AllPosts = ({ searchQuery }: { searchQuery: string }) => {
     return <div>Loading...</div>;
   }
 
-  const handleAddFavorite = (post: IPost) => {
-    console.log(post, userId);
+  const handleAddFavorite = async (post: IPost) => {
+    const favouriteData = {
+      postId: post._id,
+    };
+
+    try {
+      const res = await addFavourite({ token, favouriteData });
+      if (res.data.success === true) {
+        toast.success("Added to your favourite list");
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error("You have already added it on favourite list")
+    }
   };
 
   return (

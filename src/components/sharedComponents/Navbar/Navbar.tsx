@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from "react";
 import { AiOutlineHome } from "react-icons/ai";
-import { IoIosPeople } from "react-icons/io";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import {
@@ -132,7 +131,7 @@ const Navbar = () => {
             <Link href="/gallery">
               <li
                 className={
-                  isActive("/followers")
+                  isActive("/gallery")
                     ? "border-b-4 border-b-[#9EF01A] w-12 p-2"
                     : ""
                 }

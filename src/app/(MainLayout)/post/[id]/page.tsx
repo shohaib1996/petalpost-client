@@ -1,24 +1,17 @@
 "use client";
-import {
-  useGetCommentByPostIdQuery,
-  useGetSinglePostQuery,
-} from "@/redux/features/posts/posts.api";
 import React, { useRef, useState } from "react";
+import { useGetCommentByPostIdQuery, useGetSinglePostQuery } from "@/redux/features/posts/posts.api";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/pagination";
-
 import { Pagination } from "swiper/modules";
 import Image from "next/image";
 import { TComment } from "@/types/comment.type";
-import {
-  useAddCommentMutation,
-  useDeleteCommentMutation,
-  useUpdateCommentMutation,
-} from "@/redux/features/comments/comments.api";
+import { useAddCommentMutation, useDeleteCommentMutation, useUpdateCommentMutation } from "@/redux/features/comments/comments.api";
 import toast from "react-hot-toast";
 import { useTypedSelector } from "@/redux/hooks/useTypedSelector";
 import { jsPDF } from "jspdf";
+import { FaFacebook, FaTwitter, FaWhatsapp, FaLinkedin } from "react-icons/fa"; // Social Media Icons
 
 interface CommentErrorType {
   status?: number;
@@ -32,7 +25,6 @@ type TParams = {
 
 const PostDetails = ({ params }: TParams) => {
   const pdfRef = useRef<HTMLDivElement>(null);
-
   const [comment, setComment] = useState("");
   const [updateComment, setUpdateComment] = useState("");
   const [commentId, setCommentId] = useState("");
@@ -41,29 +33,17 @@ const PostDetails = ({ params }: TParams) => {
   const [addCommentModal, setAddCommentModal] = useState(false);
   const [updateCommentModal, setUpdateCommentModal] = useState(false);
   const token = useTypedSelector((state) => state.auth.token);
-
   const user = useTypedSelector((state) => state.auth.user);
-
   const userId = user?.id;
 
   const { id } = params;
   const { data, isLoading, error } = useGetSinglePostQuery({ id, token });
-
-  const {
-    data: allComments,
-    refetch,
-    error: commentError,
-  } = useGetCommentByPostIdQuery({ id, token }, { skip: !data });
+  const { data: allComments, refetch, error: commentError } = useGetCommentByPostIdQuery({ id, token }, { skip: !data });
 
   const isCommentErrorWithStatus = (error: any): error is CommentErrorType => {
     return error && typeof error.status === "number";
   };
-  const comments =
-    isCommentErrorWithStatus(commentError) && commentError.status === 404
-      ? []
-      : allComments?.data || [];
-
-  // console.log(commentError);
+  const comments = isCommentErrorWithStatus(commentError) && commentError.status === 404 ? [] : allComments?.data || [];
 
   const [addComment] = useAddCommentMutation();
   const [upComment] = useUpdateCommentMutation();
@@ -77,95 +57,29 @@ const PostDetails = ({ params }: TParams) => {
     return <p>Error loading post details.</p>;
   }
 
-  // console.log(allComments?.data.length);
-
   const singlePostData = data?.data || {};
-  const { title, content, images, tags, category, upvotes, downvotes, author } =
-    singlePostData;
+  const { title, content, images, tags, category, upvotes, downvotes, author } = singlePostData;
 
-  const handleAddComment = async (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log(comment);
-    const commentData = {
-      postId: id,
-      userId,
-      comment,
-      replies: [],
-    };
-    try {
-      const res = await addComment({ id, token, commentData });
-      if (res.data?.success === true) {
-        toast.success("Comment has been added!!");
-        refetch();
-        setAddCommentModal(false);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-  const handleUpdateComment = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const shareUrl = `https://petalpost-client.vercel.app/post/${id}`; // Replace with your actual post URL
 
-    console.log(updateComment, commentId);
-    const updateCommentData = {
-      comment: updateComment,
-    };
-    if (userId !== commentedUserId) {
-      return toast.error("You are not authorized to update this comment");
-    }
-    try {
-      const res = await upComment({
-        postId: id,
-        commentId,
-        token,
-        updateCommentData,
-      });
-      if (res.data?.success === true) {
-        toast.success("Comment updated successfully!!");
-        refetch();
-        setShowModal(false);
-        setUpdateCommentModal(false);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  // Sharing URLs
+  const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
+  const twitterShareUrl = `https://twitter.com/share?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(title)}`;
+  const whatsappShareUrl = `https://wa.me/?text=${encodeURIComponent(shareUrl)}`;
+  const linkedInShareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`;
 
-  const handleDeleteComment = async () => {
-    if (userId !== commentedUserId) {
-      return toast.error("You are not authorized to delete this comment");
-    }
-    try {
-      const res = await deleteComment({ postId: id, commentId, token });
-      console.log(res);
-
-      if (res.data?.success === true) {
-        toast.success("Comment deleted successfully!!");
-        refetch();
-        setShowModal(false);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
   const handleDownload = () => {
     const doc = new jsPDF();
-
     let yPosition = 10;
-    
-
-    // Check if pdfRef.current is not null before accessing innerText
     if (pdfRef.current) {
-      const content = pdfRef.current.innerText; // Get the HTML content
+      const content = pdfRef.current.innerText;
       const images = pdfRef.current.querySelectorAll("img");
 
       doc.text(content, 10, yPosition);
       yPosition += 30;
       images.forEach((img, index) => {
         const imgSrc = img.src;
-
-        // Add each image to the PDF at a new Y position
-        doc.addImage(imgSrc, "PNG", 10, yPosition, 120, 50); 
+        doc.addImage(imgSrc, "PNG", 10, yPosition, 120, 50);
         yPosition += 60;
       });
       doc.save("page.pdf");
@@ -173,174 +87,237 @@ const PostDetails = ({ params }: TParams) => {
   };
 
   return (
-    <>
-      <div className="max-w-7xl mx-auto p-5 mt-24">
-        <div ref={pdfRef}>
-          <div className="mb-4">
-            <h1 className="text-3xl font-bold mb-3">{title} </h1>
-            <span>
-              <i>
-                --by <b>{author?.name}</b>
-              </i>
-            </span>
-          </div>
-
-          <Swiper pagination={true} modules={[Pagination]} className="mySwiper">
-            {images?.map((image: string, index: number) => (
-              <SwiperSlide key={index}>
-                <Image
-                  src={image}
-                  alt={`Post image ${index + 1}`}
-                  width={500}
-                  height={100}
-                  style={{ width: "100%", height: "auto", objectFit: "cover" }}
-                />
-              </SwiperSlide>
-            ))}
-          </Swiper>
-
-          <div className="mt-10" dangerouslySetInnerHTML={{ __html: content }} />
-          <div>
-            <strong>Tags:</strong> {tags?.join(", ")}
-          </div>
-          <div>
-            <strong>Category:</strong> {category}
-          </div>
-          <div>
-            <strong>Upvotes:</strong> {upvotes} | <strong>Downvotes:</strong>
-            {downvotes} | <strong>Comments:</strong>
-            {allComments?.data.length | 0} |{" "}
-          </div>
+    <div className="max-w-7xl mx-auto p-5 mt-24">
+      <div ref={pdfRef}>
+        <div className="mb-4">
+          <h1 className="text-3xl font-bold mb-3">{title}</h1>
+          <span>
+            <i>--by <b>{author?.name}</b></i>
+          </span>
         </div>
-        <button onClick={handleDownload}>Download PDF</button>
-        <div className="divider"></div>
-        <div className="mb-5">
-          <button
-            onClick={() => setAddCommentModal(true)}
-            className="btn btn-outline btn-success btn-md"
-          >
-            Add Comment
-          </button>
+
+        <Swiper pagination={true} modules={[Pagination]} className="mySwiper">
+          {images?.map((image: string, index: number) => (
+            <SwiperSlide key={index}>
+              <Image
+                src={image}
+                alt={`Post image ${index + 1}`}
+                width={500}
+                height={100}
+                style={{ width: "100%", height: "auto", objectFit: "cover" }}
+              />
+            </SwiperSlide>
+          ))}
+        </Swiper>
+
+        <div className="mt-10" dangerouslySetInnerHTML={{ __html: content }} />
+        <div>
+          <strong>Tags:</strong> {tags?.join(", ")}
         </div>
         <div>
-          {comments.length === 0 ? (
-            <p>No comments yet. Be the first to comment!</p>
-          ) : (
-            comments.map((comment: TComment) => (
-              <div key={comment._id} className="chat chat-start">
-                <div className="chat-image avatar">
-                  <div className="w-10 rounded-full">
-                    <Image
-                      alt="User Avatar"
-                      src={comment.userId.avatar}
-                      width={50}
-                      height={50}
-                    />
-                  </div>
-                </div>
-                <div className="chat-bubble relative">
-                  <p className="p-4">{comment.userId.name}</p>
-                  <p>{comment.comment}</p>
-
-                  <button
-                    onClick={() => {
-                      setShowModal(true);
-                      setCommentId(comment._id);
-                      setCommentedUserId(comment.userId._id);
-                    }}
-                    className="ml-5 absolute top-0 end-2 text-xl font-bold btn btn-sm bg-transparent text-white border-0 hover:bg-transparent"
-                  >
-                    ...
-                  </button>
-                </div>
-              </div>
-            ))
-          )}
+          <strong>Category:</strong> {category}
         </div>
+        <div>
+          <strong>Upvotes:</strong> {upvotes} | <strong>Downvotes:</strong> {downvotes} | <strong>Comments:</strong> {comments.length} | 
+        </div>
+      </div>
 
-        {showModal && (
-          <dialog id="my_modal_3" className="modal" open>
-            <div className="modal-box w-[250px] ">
-              <form method="dialog">
+      <button onClick={handleDownload}>Download PDF</button>
+
+      <div className="divider"></div>
+
+      {/* Share Buttons */}
+      <div className="mt-6">
+        <p className="text-lg font-bold mb-3">Share this post:</p>
+        <div className="flex space-x-4">
+          <a href={facebookShareUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600">
+            <FaFacebook size={30} />
+          </a>
+          <a href={twitterShareUrl} target="_blank" rel="noopener noreferrer" className="text-blue-400">
+            <FaTwitter size={30} />
+          </a>
+          <a href={whatsappShareUrl} target="_blank" rel="noopener noreferrer" className="text-green-500">
+            <FaWhatsapp size={30} />
+          </a>
+          <a href={linkedInShareUrl} target="_blank" rel="noopener noreferrer" className="text-blue-700">
+            <FaLinkedin size={30} />
+          </a>
+        </div>
+      </div>
+
+      <div className="divider"></div>
+
+      {/* Comments Section */}
+      <div className="mb-5">
+        <button
+          onClick={() => setAddCommentModal(true)}
+          className="btn btn-outline btn-success btn-md"
+        >
+          Add Comment
+        </button>
+      </div>
+      <div>
+        {comments.length === 0 ? (
+          <p>No comments yet. Be the first to comment!</p>
+        ) : (
+          comments.map((comment: TComment) => (
+            <div key={comment._id} className="chat chat-start">
+              <div className="chat-image avatar">
+                <div className="w-10 rounded-full">
+                  <Image alt="User Avatar" src={comment.userId.avatar} width={50} height={50} />
+                </div>
+              </div>
+              <div className="chat-bubble relative">
+                <p className="p-4">{comment.userId.name}</p>
+                <p>{comment.comment}</p>
+
                 <button
-                  onClick={() => setShowModal(false)}
-                  className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+                  onClick={() => {
+                    setShowModal(true);
+                    setCommentId(comment._id);
+                    setCommentedUserId(comment.userId._id);
+                  }}
+                  className="ml-5 absolute top-0 end-2 text-xl font-bold btn btn-sm bg-transparent text-white border-0 hover:bg-transparent"
                 >
-                  ✕
-                </button>
-              </form>
-              <div className="flex flex-col space-y-4 p-5">
-                <button
-                  onClick={() => setUpdateCommentModal(true)}
-                  className="btn btn-primary"
-                >
-                  Update
-                </button>
-                <button onClick={handleDeleteComment} className="btn btn-error">
-                  Delete
+                  ...
                 </button>
               </div>
             </div>
-          </dialog>
-        )}
-        {addCommentModal && (
-          <dialog id="my_modal_3" className="modal" open>
-            <div className="modal-box w-[280px]">
-              <form method="dialog">
-                <button
-                  onClick={() => setAddCommentModal(false)}
-                  className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
-                >
-                  ✕
-                </button>
-              </form>
-              <form action="" onSubmit={handleAddComment}>
-                <textarea
-                  className="textarea textarea-bordered"
-                  placeholder="Type comment"
-                  value={comment}
-                  onChange={(e) => setComment(e.target.value)}
-                ></textarea>
-                <button
-                  type="submit"
-                  className="btn btn-outline btn-info btn-sm"
-                >
-                  Add
-                </button>
-              </form>
-            </div>
-          </dialog>
-        )}
-        {updateCommentModal && (
-          <dialog id="my_modal_3" className="modal" open>
-            <div className="modal-box w-[280px]">
-              <form method="dialog">
-                <button
-                  onClick={() => setUpdateCommentModal(false)}
-                  className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
-                >
-                  ✕
-                </button>
-              </form>
-              <form action="" onSubmit={handleUpdateComment}>
-                <textarea
-                  className="textarea textarea-bordered"
-                  placeholder="Type comment"
-                  value={updateComment}
-                  onChange={(e) => setUpdateComment(e.target.value)}
-                ></textarea>
-                <button
-                  type="submit"
-                  className="btn btn-outline btn-info btn-sm"
-                >
-                  Update
-                </button>
-              </form>
-            </div>
-          </dialog>
+          ))
         )}
       </div>
-    </>
+
+      {/* Modals for adding/updating comments */}
+      {showModal && (
+        <dialog id="my_modal_3" className="modal" open>
+          <div className="modal-box w-[250px] ">
+            <form method="dialog">
+              <button
+                onClick={() => setShowModal(false)}
+                className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+              >
+                ✕
+              </button>
+            </form>
+            {commentedUserId === userId && (
+              <>
+                <button
+                  className="btn btn-outline btn-warning btn-sm mb-3"
+                  onClick={() => {
+                    setUpdateCommentModal(true);
+                    setShowModal(false);
+                  }}
+                >
+                  Edit
+                </button>
+                <button
+                  className="btn btn-outline btn-error btn-sm mb-3"
+                  onClick={async () => {
+                    try {
+                      await deleteComment({ commentId, token });
+                      refetch();
+                      setShowModal(false);
+                    } catch (error: any) {
+                      toast.error(error?.data?.message);
+                    }
+                  }}
+                >
+                  Delete
+                </button>
+              </>
+            )}
+          </div>
+        </dialog>
+      )}
+
+      {addCommentModal && (
+        <dialog id="my_modal_3" className="modal" open>
+          <div className="modal-box">
+            <form method="dialog">
+              <button
+                onClick={() => setAddCommentModal(false)}
+                className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+              >
+                ✕
+              </button>
+            </form>
+            <h3 className="font-bold text-lg mb-3">Add Comment</h3>
+
+            <input
+              type="text"
+              placeholder="Write your comment"
+              className="input input-bordered input-info w-full mb-3"
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+            />
+
+            <button
+              onClick={async () => {
+                try {
+                  await addComment({
+                    token,
+                    postId: id,
+                    comment,
+                  });
+                  refetch();
+                  setComment("");
+                  setAddCommentModal(false);
+                } catch (error: any) {
+                  toast.error(error?.data?.message);
+                }
+              }}
+              className="btn btn-outline btn-success btn-md"
+            >
+              Comment
+            </button>
+          </div>
+        </dialog>
+      )}
+
+      {updateCommentModal && (
+        <dialog id="my_modal_3" className="modal" open>
+          <div className="modal-box">
+            <form method="dialog">
+              <button
+                onClick={() => setUpdateCommentModal(false)}
+                className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+              >
+                ✕
+              </button>
+            </form>
+            <h3 className="font-bold text-lg mb-3">Update Comment</h3>
+
+            <input
+              type="text"
+              placeholder="Update your comment"
+              className="input input-bordered input-info w-full mb-3"
+              value={updateComment}
+              onChange={(e) => setUpdateComment(e.target.value)}
+            />
+
+            <button
+              onClick={async () => {
+                try {
+                  await upComment({
+                    token,
+                    commentId,
+                    comment: updateComment,
+                  });
+                  refetch();
+                  setUpdateComment("");
+                  setUpdateCommentModal(false);
+                } catch (error: any) {
+                  toast.error(error?.data?.message);
+                }
+              }}
+              className="btn btn-outline btn-success btn-md"
+            >
+              Update Comment
+            </button>
+          </div>
+        </dialog>
+      )}
+    </div>
   );
 };
 

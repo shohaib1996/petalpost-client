@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { FaHome } from "react-icons/fa";
+import { AiOutlineHome } from "react-icons/ai";
 import { IoIosPeople } from "react-icons/io";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
@@ -13,6 +13,10 @@ import Image from "next/image";
 import toast from "react-hot-toast";
 import { Logout } from "@/redux/features/auth/authSlice";
 import { MdWorkspacePremium } from "react-icons/md";
+import { GrGallery } from "react-icons/gr";
+import { GoPeople } from "react-icons/go";
+import { AiOutlineMail } from "react-icons/ai";
+
 
 
 const Navbar = () => {
@@ -104,14 +108,14 @@ const Navbar = () => {
           </Link>
         </div>
         <div className="navbar-center hidden lg:flex">
-          <ul className="px-1 flex justify-center items-center gap-32">
+          <ul className="px-1 flex justify-center items-center gap-28">
             <Link href="/">
               <li
                 className={
                   isActive("/") ? "border-b-4 border-b-[#9EF01A] w-12 p-2" : ""
                 }
               >
-                <FaHome className="text-white text-2xl w-full mx-auto" />
+                <AiOutlineHome className="text-white text-2xl w-full mx-auto" />
               </li>
             </Link>
             <Link href="/followers">
@@ -122,7 +126,29 @@ const Navbar = () => {
                     : ""
                 }
               >
-                <IoIosPeople className="text-white text-2xl w-full mx-auto" />
+                <GoPeople className="text-white text-2xl w-full mx-auto" />
+              </li>
+            </Link>
+            <Link href="/gallery">
+              <li
+                className={
+                  isActive("/followers")
+                    ? "border-b-4 border-b-[#9EF01A] w-12 p-2"
+                    : ""
+                }
+              >
+                <GrGallery className="text-white text-2xl w-full mx-auto" />
+              </li>
+            </Link>
+            <Link href="/followers">
+              <li
+                className={
+                  isActive("/followers")
+                    ? "border-b-4 border-b-[#9EF01A] w-12 p-2"
+                    : ""
+                }
+              >
+                <AiOutlineMail className="text-white text-2xl w-full mx-auto" />
               </li>
             </Link>
           </ul>

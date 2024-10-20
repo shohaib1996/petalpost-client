@@ -9,6 +9,7 @@ import { useTypedSelector } from "@/redux/hooks/useTypedSelector";
 import React, { useEffect } from "react";
 import toast from "react-hot-toast";
 
+
 interface User {
   _id: string;
   name: string;
@@ -38,7 +39,10 @@ const Followers = () => {
     data: followings,
     isLoading: followingLoading,
     refetch,
-  } = useGetFollowingsQuery({ token, userId },  { skip: !followers?.data?.length } );
+  } = useGetFollowingsQuery(
+    { token, userId },
+    { skip: !followers?.data?.length }
+  );
 
   useEffect(() => {
     if (followers?.data?.length && userId && token) {
@@ -52,8 +56,6 @@ const Followers = () => {
   if (followingLoading) {
     return <p>Loading....</p>;
   }
-
-
 
   const handleUnFollow = async (id: string) => {
     console.log(id);

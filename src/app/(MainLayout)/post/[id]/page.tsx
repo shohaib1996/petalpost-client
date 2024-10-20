@@ -3,7 +3,7 @@ import {
   useGetCommentByPostIdQuery,
   useGetSinglePostQuery,
 } from "@/redux/features/posts/posts.api";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/pagination";
@@ -18,10 +18,10 @@ import {
 } from "@/redux/features/comments/comments.api";
 import toast from "react-hot-toast";
 import { useTypedSelector } from "@/redux/hooks/useTypedSelector";
+import { jsPDF } from "jspdf";
 
 interface CommentErrorType {
   status?: number;
-  
 }
 
 type TParams = {
@@ -31,6 +31,8 @@ type TParams = {
 };
 
 const PostDetails = ({ params }: TParams) => {
+  const pdfRef = useRef<HTMLDivElement>(null);
+
   const [comment, setComment] = useState("");
   const [updateComment, setUpdateComment] = useState("");
   const [commentId, setCommentId] = useState("");
@@ -54,14 +56,14 @@ const PostDetails = ({ params }: TParams) => {
   } = useGetCommentByPostIdQuery({ id, token }, { skip: !data });
 
   const isCommentErrorWithStatus = (error: any): error is CommentErrorType => {
-    return error && typeof error.status === 'number';
+    return error && typeof error.status === "number";
   };
-  const comments = isCommentErrorWithStatus(commentError) && commentError.status === 404
-    ? [] 
-    : allComments?.data || [];
+  const comments =
+    isCommentErrorWithStatus(commentError) && commentError.status === 404
+      ? []
+      : allComments?.data || [];
 
-
-  console.log(commentError);
+  // console.log(commentError);
 
   const [addComment] = useAddCommentMutation();
   const [upComment] = useUpdateCommentMutation();
@@ -146,45 +148,71 @@ const PostDetails = ({ params }: TParams) => {
       console.log(error);
     }
   };
+  const handleDownload = () => {
+    const doc = new jsPDF();
+
+    let yPosition = 10;
+    
+
+    // Check if pdfRef.current is not null before accessing innerText
+    if (pdfRef.current) {
+      const content = pdfRef.current.innerText; // Get the HTML content
+      const images = pdfRef.current.querySelectorAll("img");
+
+      doc.text(content, 10, yPosition);
+      yPosition += 30;
+      images.forEach((img, index) => {
+        const imgSrc = img.src;
+
+        // Add each image to the PDF at a new Y position
+        doc.addImage(imgSrc, "PNG", 10, yPosition, 120, 50); 
+        yPosition += 60;
+      });
+      doc.save("page.pdf");
+    }
+  };
 
   return (
     <>
       <div className="max-w-7xl mx-auto p-5 mt-24">
-        <div className="mb-4">
-          <h1 className="text-3xl font-bold mb-3">{title} </h1>
-          <span>
-            <i>
-              --by <b>{author?.name}</b>
-            </i>
-          </span>
-        </div>
+        <div ref={pdfRef}>
+          <div className="mb-4">
+            <h1 className="text-3xl font-bold mb-3">{title} </h1>
+            <span>
+              <i>
+                --by <b>{author?.name}</b>
+              </i>
+            </span>
+          </div>
 
-        <Swiper pagination={true} modules={[Pagination]} className="mySwiper">
-          {images?.map((image: string, index: number) => (
-            <SwiperSlide key={index}>
-              <Image
-                src={image}
-                alt={`Post image ${index + 1}`}
-                width={500}
-                height={100}
-                style={{ width: "100%", height: "auto", objectFit: "cover" }}
-              />
-            </SwiperSlide>
-          ))}
-        </Swiper>
+          <Swiper pagination={true} modules={[Pagination]} className="mySwiper">
+            {images?.map((image: string, index: number) => (
+              <SwiperSlide key={index}>
+                <Image
+                  src={image}
+                  alt={`Post image ${index + 1}`}
+                  width={500}
+                  height={100}
+                  style={{ width: "100%", height: "auto", objectFit: "cover" }}
+                />
+              </SwiperSlide>
+            ))}
+          </Swiper>
 
-        <div dangerouslySetInnerHTML={{ __html: content }} />
-        <div>
-          <strong>Tags:</strong> {tags?.join(", ")}
+          <div className="mt-10" dangerouslySetInnerHTML={{ __html: content }} />
+          <div>
+            <strong>Tags:</strong> {tags?.join(", ")}
+          </div>
+          <div>
+            <strong>Category:</strong> {category}
+          </div>
+          <div>
+            <strong>Upvotes:</strong> {upvotes} | <strong>Downvotes:</strong>
+            {downvotes} | <strong>Comments:</strong>
+            {allComments?.data.length | 0} |{" "}
+          </div>
         </div>
-        <div>
-          <strong>Category:</strong> {category}
-        </div>
-        <div>
-          <strong>Upvotes:</strong> {upvotes} | <strong>Downvotes:</strong>
-          {downvotes} | <strong>Comments:</strong>
-          {allComments?.data.length | 0}
-        </div>
+        <button onClick={handleDownload}>Download PDF</button>
         <div className="divider"></div>
         <div className="mb-5">
           <button

@@ -53,7 +53,7 @@ const CheckoutForm = ({ price }: { price: number }) => {
     return <p>Loading...</p>;
   }
 
-  const totalUpvote = userPosts.data.reduce((acc: number, curr: IPost ) => acc+curr.upvotes, 0)
+  const totalUpvote = userPosts?.data.reduce((acc: number, curr: IPost ) => acc+curr.upvotes, 0)
  
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

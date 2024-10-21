@@ -10,3 +10,15 @@ export type TComment = {
     updatedAt: string;
     __v: number;
 };
+
+export type TTableUser = {
+    _id: string;
+    name: string;
+    email: string;
+    role: "user" | "admin"; 
+    avatar: string;
+    isPremium: boolean;
+    createdAt: string;
+    updatedAt: string;
+    __v: number;
+};

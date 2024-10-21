@@ -1,8 +1,11 @@
+import DashboardComponent from '@/components/Dashboard/Dashboard'
 import React from 'react'
 
 const Dashboard = () => {
   return (
-    <div>Dashboard</div>
+    <>
+     <DashboardComponent></DashboardComponent>
+    </>
   )
 }
 

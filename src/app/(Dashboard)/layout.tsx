@@ -35,6 +35,9 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
             <Link href="/dashboard/all-post">
               <li className="text-xl font-bold btn bg-transparent border-0 w-full">Content Moderation</li>
             </Link>
+            <Link href="/dashboard">
+              <li className="text-xl font-bold btn bg-transparent border-0 w-full">Analytics</li>
+            </Link>
           </div>
         </ul>
       </div>

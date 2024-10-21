@@ -27,7 +27,7 @@ const postsApi = baseApi.injectEndpoints({
       },
     }),
     deletePost: builder.mutation({
-      query: ({token, postId }) => {
+      query: ({ token, postId }) => {
         return {
           url: `/post/${postId}`,
           method: "DELETE",
@@ -39,15 +39,25 @@ const postsApi = baseApi.injectEndpoints({
     }),
     getAllPost: builder.query({
       query: ({ searchQuery, page }) => {
-
         console.log(searchQuery, page);
-      
+
         const queryString = searchQuery
           ? `?title=${searchQuery}&page=${page}`
           : `?page=${page}`;
         return {
           url: `post/posts${queryString}`,
           method: "GET",
+        };
+      },
+    }),
+    getAllPostsWithoutPagination: builder.query({
+      query: ({ token }) => {
+        return {
+          url: `post/posts/all`,
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         };
       },
     }),
@@ -90,6 +100,15 @@ const postsApi = baseApi.injectEndpoints({
         },
       }),
     }),
+    getTopAuthor: builder.query({
+      query: ({ token }) => ({
+        url: `post/upvotes/top-authors`,
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }),
+    }),
   }),
 });
 
@@ -101,5 +120,7 @@ export const {
   useAddPostMutation,
   useGetPostByUserIdQuery,
   useUpdatePostMutation,
-  useDeletePostMutation
+  useDeletePostMutation,
+  useGetAllPostsWithoutPaginationQuery,
+  useGetTopAuthorQuery,
 } = postsApi;

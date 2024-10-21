@@ -14,7 +14,7 @@ const AllUser = () => {
   const token = useTypedSelector((state) => state.auth.token);
   const [updateRole] = useUserRoleUpdateMutation();
 
-  const { data, isLoading, refetch} = useGetAllUserQuery({ token });
+  const { data, isLoading, refetch } = useGetAllUserQuery({ token });
   if (isLoading) {
     return <p>Loading...</p>;
   }
@@ -27,10 +27,10 @@ const AllUser = () => {
 
     try {
       const res = await updateRole({ token, updateInfo, userId: id });
-      console.log(res)
+      console.log(res);
       if (res.data.success === true) {
         toast.success("Update the role successfully");
-        refetch()
+        refetch();
       }
     } catch (error) {}
   };
@@ -44,7 +44,7 @@ const AllUser = () => {
       const res = await updateRole({ token, updateInfo, userId: id });
       if (res.data.success === true) {
         toast.success("Update the role successfully");
-        refetch()
+        refetch();
       }
     } catch (error) {}
   };

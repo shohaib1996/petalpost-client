@@ -9,7 +9,7 @@ import {
 } from "@reduxjs/toolkit/query/react";
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: "http://localhost:5000/api/",  //https://petalpost-backend.vercel.app/   //http://localhost:5000/
+  baseUrl: "https://petalpost-backend.vercel.app/",  //https://petalpost-backend.vercel.app/   //http://localhost:5000/
 });
 
 const baseQueryWithoutAuth: BaseQueryFn<

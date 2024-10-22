@@ -119,10 +119,10 @@ const Navbar = () => {
                   <AiOutlineHome className="text-white text-2xl w-full mx-auto" />
                 </li>
               </Link>
-              <Link href="/followers">
+              <Link href="/about-us">
                 <li
                   className={
-                    isActive("/followers")
+                    isActive("/about-us")
                       ? "border-b-4 border-b-[#9EF01A] w-12 p-2"
                       : ""
                   }
@@ -141,10 +141,10 @@ const Navbar = () => {
                   <GrGallery className="text-white text-2xl w-full mx-auto" />
                 </li>
               </Link>
-              <Link href="/followers">
+              <Link href="/contact-us">
                 <li
                   className={
-                    isActive("/followers")
+                    isActive("/contact-us")
                       ? "border-b-4 border-b-[#9EF01A] w-12 p-2"
                       : ""
                   }

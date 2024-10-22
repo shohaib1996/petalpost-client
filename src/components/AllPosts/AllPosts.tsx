@@ -20,14 +20,17 @@ import { useAddFavouriteMutation } from "@/redux/features/favourite/favourite.ap
 const AllPosts = ({ searchQuery }: { searchQuery: string }) => {
   const [page, setPage] = useState(1);
   const [posts, setPosts] = useState<IPost[]>([]);
+  const [filter, setFilter] = useState("");
   const { data, isLoading, refetch } = useGetAllPostQuery({
     searchQuery,
     page,
+    filter,
   });
   const [addFavourite] = useAddFavouriteMutation();
   const [hasMore, setHasMore] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [followId, setFollowId] = useState("");
+
   const [addFollowing] = useAddFollowingMutation();
   const token = useTypedSelector((state) => state.auth.token);
   const user = useTypedSelector((state) => state.auth.user);
@@ -43,7 +46,7 @@ const AllPosts = ({ searchQuery }: { searchQuery: string }) => {
     setPosts([]);
     setPage(1);
     refetch();
-  }, [searchQuery]);
+  }, [searchQuery, filter]);
 
   const stripHtmlTags = (html: string) => {
     const div = document.createElement("div");
@@ -106,7 +109,11 @@ const AllPosts = ({ searchQuery }: { searchQuery: string }) => {
   };
 
   if (isLoading && page === 1) {
-    return <div>Loading...</div>;
+    return (
+      <div className="min-h-screen min-w-[100vw] flex items-center justify-center">
+        <span className="loading loading-bars loading-lg"></span>
+      </div>
+    );
   }
 
   const handleAddFavorite = async (post: IPost) => {
@@ -121,120 +128,143 @@ const AllPosts = ({ searchQuery }: { searchQuery: string }) => {
       }
     } catch (error) {
       console.log(error);
-      toast.error("You have already added it on favourite list")
+      toast.error("You have already added it on favourite list");
     }
   };
 
-  return (
-    <div className="grid gap-6 justify-center mt-8 p-5 lg:p-0" >
-      {posts.map((post: IPost) => {
-        const userVote = getUserVoteStatus(post.voters);
+  const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setFilter(event.target.value);
+  };
 
-        return (
-          <div
-            key={post._id}
-            className="card card-compact bg-base-100 shadow-xl"
-          >
-            <figure className="relative">
-              <Image
-                src={post.images[0] || "https://via.placeholder.com/400"}
-                alt={post.title}
-                className="w-full h-[450px] object-cover"
-                width={500}
-                height={500}
-              />
-              <div className="absolute top-[3%] lg:left-[90%] left-[80%]">
-                <button
-                  onClick={() => handleAddFavorite(post)}
-                  className="btn btn-sm bg-slate-300 border-none"
-                >
-                  <MdFavoriteBorder className="text-3xl text-purple-700" />
-                </button>
-              </div>
-            </figure>
-            <div className="card-body">
-              <h2 className="card-title">{post.title}</h2>
-              <p>
-                {stripHtmlTags(post.content).substring(0, 100)}...{" "}
-                <Link
-                  href={`post/${post._id}`}
-                  className="btn btn-primary btn-sm"
-                >
-                  Read More
-                </Link>
-              </p>
-              <div className="flex">
-                <p className="flex items-center gap-3">
-                  Upvotes: {post.upvotes}{" "}
-                  <span
-                    onClick={() => handleVote(post._id, { vote: 1 })}
-                    className={`text-xl font-bold cursor-pointer ${
-                      userVote === 1 ? "text-blue-500" : ""
-                    }`}
+  return (
+    <div>
+      <div className="max-w-3xl mx-auto p-5 lg:p-0">
+        <select
+          onChange={handleSelectChange}
+          className="select select-bordered w-full "
+        >
+          <option disabled selected>
+            Filter by Most Upvotes
+          </option>
+          <option value="mostPopular">Most Popular</option>
+          <option value="leastPopular">Least Popular</option>
+        </select>
+      </div>
+      <div className="grid gap-6 justify-center mt-8 p-5 lg:p-0 max-w-3xl mx-auto">
+        {posts.map((post: IPost) => {
+          const userVote = getUserVoteStatus(post.voters);
+
+          return (
+            <div
+              key={post._id}
+              className="card card-compact bg-base-100 shadow-xl"
+            >
+              <figure className="relative">
+                <Image
+                  src={post.images[0] || "https://via.placeholder.com/400"}
+                  alt={post.title}
+                  className="w-full h-[450px] object-cover"
+                  width={500}
+                  height={500}
+                />
+                <div className="absolute top-[3%] lg:left-[90%] left-[80%]">
+                  <button
+                    onClick={() => handleAddFavorite(post)}
+                    className="btn btn-sm bg-slate-300 border-none"
                   >
-                    <BiUpvote />
-                  </span>
+                    <MdFavoriteBorder className="text-3xl text-purple-700" />
+                  </button>
+                </div>
+              </figure>
+              <div className="card-body">
+                <h2 className="card-title">{post.title}</h2>
+                <p>
+                  {stripHtmlTags(post.content).substring(0, 100)}...{" "}
+                  <Link
+                    href={`post/${post._id}`}
+                    className="btn btn-primary btn-sm"
+                  >
+                    Read More
+                  </Link>
                 </p>
-                <p className="flex items-center gap-3">
-                  Downvotes: {post.downvotes}{" "}
-                  <span
-                    onClick={() => handleVote(post._id, { vote: -1 })}
-                    className={`text-xl font-bold cursor-pointer ${
-                      userVote === -1 ? "text-red-500" : ""
-                    }`}
-                  >
-                    <BiDownvote />
-                  </span>
-                </p>
-                {post.author && (
-                  <div
-                    className="flex items-center gap-2 cursor-pointer"
-                    onClick={() => {
-                      setShowModal(true), setFollowId(post.author._id);
-                    }}
-                  >
-                    <div className="w-12 rounded-full">
-                      <Image
-                        src={post.author.avatar}
-                        alt={post.author.name}
-                        width={48}
-                        height={48}
-                      />
+                <div className="flex">
+                  <p className="flex items-center gap-3">
+                    Upvotes: {post.upvotes}{" "}
+                    <span
+                      onClick={() => handleVote(post._id, { vote: 1 })}
+                      className={`text-xl font-bold cursor-pointer ${
+                        userVote === 1 ? "text-blue-500" : ""
+                      }`}
+                    >
+                      <BiUpvote />
+                    </span>
+                  </p>
+                  <p className="flex items-center gap-3">
+                    Downvotes: {post.downvotes}{" "}
+                    <span
+                      onClick={() => handleVote(post._id, { vote: -1 })}
+                      className={`text-xl font-bold cursor-pointer ${
+                        userVote === -1 ? "text-red-500" : ""
+                      }`}
+                    >
+                      <BiDownvote />
+                    </span>
+                  </p>
+                  {post.author && (
+                    <div className="tooltip" data-tip="follow">
+                      <div
+                        className="flex items-center gap-2 cursor-pointer"
+                        onClick={() => {
+                          setShowModal(true), setFollowId(post.author._id);
+                        }}
+                      >
+                        <div className="w-12 rounded-full">
+                          <Image
+                            src={post.author.avatar}
+                            alt={post.author.name}
+                            width={48}
+                            height={48}
+                          />
+                        </div>
+                        <p>{post.author.name || "Anonymous"}</p>
+                      </div>
                     </div>
-                    <p>{post.author.name || "Anonymous"}</p>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-        );
-      })}
+          );
+        })}
 
-      {/* Loader for infinite scroll */}
-      <div ref={loadMoreRef} className="w-full text-center py-8">
-        {hasMore && <div>Loading more posts...</div>}
-        {!hasMore && <div>No more posts to load.</div>}
+        {/* Loader for infinite scroll */}
+        <div ref={loadMoreRef} className="w-full text-center py-8">
+          {hasMore && <div>Loading more posts...</div>}
+          {!hasMore && <div>No more posts to load.</div>}
+        </div>
+
+        {showModal && (
+          <dialog id="my_modal_3" className="modal" open>
+            <div className="modal-box w-[150px]">
+              <form method="dialog">
+                <button
+                  onClick={() => setShowModal(false)}
+                  className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+                >
+                  ✕
+                </button>
+              </form>
+              <form action="" onSubmit={handleFollow}>
+                <button
+                  type="submit"
+                  className="btn btn-outline btn-info btn-sm"
+                >
+                  Follow
+                </button>
+              </form>
+            </div>
+          </dialog>
+        )}
       </div>
-
-      {showModal && (
-        <dialog id="my_modal_3" className="modal" open>
-          <div className="modal-box w-[150px]">
-            <form method="dialog">
-              <button
-                onClick={() => setShowModal(false)}
-                className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
-              >
-                ✕
-              </button>
-            </form>
-            <form action="" onSubmit={handleFollow}>
-              <button type="submit" className="btn btn-outline btn-info btn-sm">
-                Follow
-              </button>
-            </form>
-          </div>
-        </dialog>
-      )}
     </div>
   );
 };

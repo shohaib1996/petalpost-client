@@ -28,10 +28,10 @@ const UserProfile = () => {
   const [deletePost] = useDeletePostMutation();
 
   if (isLoading) {
-    return <p>Loading...</p>;
+    return <div className="min-h-screen min-w-[100vw] flex items-center justify-center"><span className="loading loading-bars loading-lg"></span></div>;
   }
 
-  // console.log(data);
+  console.log(data?.data);
 
   const stripHtmlTags = (html: string) => {
     const div = document.createElement("div");
@@ -79,71 +79,77 @@ const UserProfile = () => {
         </button>
       </div>
       <div className="grid grid-cols-1 gap-6">
-        {data?.data.map((post: IPost) => (
-          <div
-            key={post._id}
-            className="card card-compact bg-base-100 shadow-xl"
-          >
-            <figure>
-              <img
-                src={post.images[0] || "https://via.placeholder.com/400"}
-                alt={post.title}
-                className="w-full h-[450px] object-cover"
-              />
-            </figure>
-            <div className="card-body">
-              <h2 className="card-title">{post.title}</h2>
-              <p>
-                {stripHtmlTags(post.content).substring(0, 100)}...{" "}
-                <Link
-                  href={`post/${post._id}`}
-                  className="btn btn-primary btn-sm"
-                >
-                  Read More
-                </Link>
-              </p>
-              <div className="flex justify-between items-center lg:flex-row flex-col gap-5 lg:gap-0">
-                <div className="flex justify-between items-center">
-                  <p className="flex items-center gap-3">
-                    Upvotes: {post.upvotes} <BiUpvote />
-                  </p>
-                  <p className="flex items-center gap-3">
-                    Downvotes: {post.downvotes} <BiDownvote />
-                  </p>
-                  <div className="lg:ml-10 ml-0">
-                    {post.author && (
-                      <div className="flex items-center gap-2 cursor-pointer">
-                        <div className="w-12 rounded-full">
-                          <Image
-                            src={post.author.avatar}
-                            alt={post.author.name}
-                            width={48}
-                            height={48}
-                          />
+        {data?.data.length === 0 || data?.data == undefined? (
+          <p className="text-center text-lg font-semibold">
+            You do not have any posts yet.
+          </p>
+        ) : (
+          data?.data.map((post: IPost) => (
+            <div
+              key={post._id}
+              className="card card-compact bg-base-100 shadow-xl"
+            >
+              <figure>
+                <img
+                  src={post.images[0] || "https://via.placeholder.com/400"}
+                  alt={post.title}
+                  className="w-full h-[450px] object-cover"
+                />
+              </figure>
+              <div className="card-body">
+                <h2 className="card-title">{post.title}</h2>
+                <p>
+                  {stripHtmlTags(post.content).substring(0, 100)}...{" "}
+                  <Link
+                    href={`post/${post._id}`}
+                    className="btn btn-primary btn-sm"
+                  >
+                    Read More
+                  </Link>
+                </p>
+                <div className="flex justify-between items-center lg:flex-row flex-col gap-5 lg:gap-0">
+                  <div className="flex justify-between items-center">
+                    <p className="flex items-center gap-3">
+                      Upvotes: {post.upvotes} <BiUpvote />
+                    </p>
+                    <p className="flex items-center gap-3">
+                      Downvotes: {post.downvotes} <BiDownvote />
+                    </p>
+                    <div className="lg:ml-10 ml-0">
+                      {post.author && (
+                        <div className="flex items-center gap-2 cursor-pointer">
+                          <div className="w-12 rounded-full">
+                            <Image
+                              src={post.author.avatar}
+                              alt={post.author.name}
+                              width={48}
+                              height={48}
+                            />
+                          </div>
+                          <p>{post.author.name || "Anonymous"}</p>
                         </div>
-                        <p>{post.author.name || "Anonymous"}</p>
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </div>
-                </div>
-                <div className="ml-5 flex gap-3">
-                  <button
-                    onClick={() => handleUpdatePost(post)}
-                    className="btn btn-sm bg-[#2DA64D] hover:bg-green-500 text-white"
-                  >
-                    Update
-                  </button>
-                  <button
-                    onClick={() => handleDeletePost(post?._id)}
-                    className="btn btn-sm bg-red-500 hover:bg-red-400 text-white"
-                  >
-                    Delete
-                  </button>
+                  <div className="ml-5 flex gap-3">
+                    <button
+                      onClick={() => handleUpdatePost(post)}
+                      className="btn btn-sm bg-[#2DA64D] hover:bg-green-500 text-white"
+                    >
+                      Update
+                    </button>
+                    <button
+                      onClick={() => handleDeletePost(post?._id)}
+                      className="btn btn-sm bg-red-500 hover:bg-red-400 text-white"
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
 
       <ProfileUpdateModal showModal={showModal} setShowModal={setShowModal} />

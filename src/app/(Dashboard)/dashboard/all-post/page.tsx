@@ -15,7 +15,7 @@ const AllPost = () => {
   const allPost = data?.data || [];
 
   if (isLoading) {
-    return <p>Loading ....</p>;
+    return <div className="min-h-screen min-w-[60vw] flex items-center justify-center"><span className="loading loading-bars loading-lg"></span></div>;
   }
 
   const handleDeletePost = async (id: string) => {

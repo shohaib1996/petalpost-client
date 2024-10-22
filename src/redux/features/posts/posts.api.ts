@@ -38,18 +38,26 @@ const postsApi = baseApi.injectEndpoints({
       },
     }),
     getAllPost: builder.query({
-      query: ({ searchQuery, page }) => {
-        console.log(searchQuery, page);
+      query: ({ searchQuery, page, filter }) => {
 
-        const queryString = searchQuery
-          ? `?title=${searchQuery}&page=${page}`
-          : `?page=${page}`;
+        let queryString = `?page=${page}`;
+        if (searchQuery) {
+          queryString = `?title=${searchQuery}&page=${page}`;
+        }
+        if (filter) {
+          queryString = `?sortBy=${filter}&page=${page}`;
+        }
+
+        console.log(queryString);
+        
+    
         return {
           url: `post/posts${queryString}`,
           method: "GET",
         };
       },
     }),
+    
     getAllPostsWithoutPagination: builder.query({
       query: ({ token }) => {
         return {

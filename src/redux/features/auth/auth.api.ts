@@ -22,7 +22,7 @@ const authApi = baseApi.injectEndpoints({
     }),
 
     userUpdate: builder.mutation({
-      query: ({token, updateInfo}) => {
+      query: ({ token, updateInfo }) => {
         return {
           url: "auth/user/profile",
           method: "PUT",
@@ -34,9 +34,9 @@ const authApi = baseApi.injectEndpoints({
       },
     }),
     userRoleUpdate: builder.mutation({
-      query: ({token, updateInfo, userId}) => {
+      query: ({ token, updateInfo, userId }) => {
         console.log(userId);
-        
+
         return {
           url: `auth/user/role/${userId}`,
           method: "PUT",
@@ -48,7 +48,7 @@ const authApi = baseApi.injectEndpoints({
       },
     }),
     getAllUser: builder.query({
-      query: ({token}) => {
+      query: ({ token }) => {
         return {
           url: "auth/users",
           method: "GET",
@@ -57,8 +57,26 @@ const authApi = baseApi.injectEndpoints({
           },
         };
       },
-    })
+    }),
+    getPremiumUserStatsFromDB: builder.query({
+      query: ({ token }) => {
+        return {
+          url: "auth/users/premium-stats",
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        };
+      },
+    }),
   }),
 });
 
-export const { useLoginMutation, useRegisterMutation, useUserUpdateMutation, useGetAllUserQuery, useUserRoleUpdateMutation} = authApi;
+export const {
+  useLoginMutation,
+  useRegisterMutation,
+  useUserUpdateMutation,
+  useGetAllUserQuery,
+  useUserRoleUpdateMutation,
+  useGetPremiumUserStatsFromDBQuery,
+} = authApi;

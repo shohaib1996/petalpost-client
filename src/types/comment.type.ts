@@ -41,3 +41,8 @@ export type AuthorUpvote = {
   totalUpvotes: number;
   authorDetails: AuthorDetails;
 };
+
+export type TPremiumUserStats = {
+  count: number;
+  premiumStatus: "Premium Member" | "Not Premium";
+};

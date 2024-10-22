@@ -64,7 +64,7 @@ const PostDetails = ({ params }: TParams) => {
   const [deleteComment] = useDeleteCommentMutation();
 
   if (isLoading) {
-    return <p>Loading...</p>;
+    return <div className="min-h-screen min-w-[100vw] flex items-center justify-center"><span className="loading loading-bars loading-lg"></span></div>;
   }
 
   if (error) {

@@ -9,7 +9,7 @@ import {
 } from "@reduxjs/toolkit/query/react";
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: "https://petalpost-backend.vercel.app/",  //https://petalpost-backend.vercel.app/   //http://localhost:5000/
+  baseUrl: "https://petalpost-backend.vercel.app/api/",  //https://petalpost-backend.vercel.app/   //http://localhost:5000/
 });
 
 const baseQueryWithoutAuth: BaseQueryFn<
@@ -26,7 +26,7 @@ const baseQueryWithoutAuth: BaseQueryFn<
   } else if (result?.error?.status === 401) {
     console.error("Error 401: Unauthorized");
   } else if (result?.error?.status === "PARSING_ERROR") {
-    console.error("Error 500: Unauthorized");
+    console.error("Parsing Error: Invalid Response Format");
   }
 
   return result;

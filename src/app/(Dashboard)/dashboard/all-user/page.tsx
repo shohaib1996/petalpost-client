@@ -32,7 +32,9 @@ const AllUser = () => {
         toast.success("Update the role successfully");
         refetch();
       }
-    } catch (error) {}
+    } catch (error) {
+      console.log(error)
+    }
   };
 
   const handleUser = async (id: string) => {
@@ -46,7 +48,9 @@ const AllUser = () => {
         toast.success("Update the role successfully");
         refetch();
       }
-    } catch (error) {}
+    } catch (error) {
+      console.log(error)
+    }
   };
 
   return (

@@ -1,4 +1,4 @@
-import React, { FormEvent, useState } from "react";
+import React, { useState } from "react";
 import UploadImageComponent from "../UploadImage/UploadImageComponent";
 import { useUserUpdateMutation } from "@/redux/features/auth/auth.api";
 import { useTypedSelector } from "@/redux/hooks/useTypedSelector";

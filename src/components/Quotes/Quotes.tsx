@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React from "react";
 // Import Swiper React components
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay } from "swiper/modules";
@@ -35,7 +35,7 @@ const Quotes = () => {
         </SwiperSlide>
         <SwiperSlide>
           <q className="text-xl font-bold flex items-center justify-center">
-            In every gardener, there is a child who believes in the seed's
+            In every gardener, there is a child who believes in the seed &apos;s
             magic.
           </q>
         </SwiperSlide>
@@ -51,13 +51,13 @@ const Quotes = () => {
         </SwiperSlide>
         <SwiperSlide>
           <q className="text-xl font-bold flex items-center justify-center text-center">
-            Gardens are not made by singing 'Oh, how beautiful!' and sitting in
+            Gardens are not made by singing &apos;Oh, how beautiful!&apos;and sitting in
             the shade.
           </q>
         </SwiperSlide>
         <SwiperSlide>
           <q className="text-xl font-bold flex items-center justify-center">
-            In every gardener, there is a child who believes in the seed's
+            In every gardener, there is a child who believes in the seed&apos;s
             magic.
           </q>
         </SwiperSlide>

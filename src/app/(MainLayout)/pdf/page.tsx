@@ -11,7 +11,7 @@ const PDFGenerator: React.FC = () => {
 
     // Check if pdfRef.current is not null before processing
     if (pdfRef.current) {
-      const content = pdfRef.current.innerHTML; // Get the HTML content
+    // Get the HTML content
       const img = pdfRef.current.querySelector("img") as HTMLImageElement; // Get the image element
 
       // Add text to PDF

@@ -104,7 +104,7 @@ const PostDetails = ({ params }: TParams) => {
       yPosition += 30;
 
       if (images) {
-        const promises = Array.from(images).map(async (img, index) => {
+        const promises = Array.from(images).map(async (img) => {
           const imgSrc = img.src;
 
           try {
@@ -116,7 +116,7 @@ const PostDetails = ({ params }: TParams) => {
             const blob = await response.blob();
 
             const reader = new FileReader();
-            return new Promise<void>((resolve, reject) => {
+            return new Promise<void>((resolve) => {
               reader.onloadend = () => {
                 const base64Image = reader.result;
                 if (typeof base64Image === "string") {

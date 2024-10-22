@@ -26,7 +26,11 @@ export interface IPost {
   createdAt: string;
   updatedAt: string;
   __v: number;
-  voters: string[];
+  voters: {
+    userId: string;
+    vote: number;
+  }[];
+  userVote?: number;
 }
 
 export type TVote = {

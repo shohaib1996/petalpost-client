@@ -30,7 +30,6 @@ const AllPosts = ({ searchQuery }: { searchQuery: string }) => {
   const [hasMore, setHasMore] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [followId, setFollowId] = useState("");
-
   const [addFollowing] = useAddFollowingMutation();
   const token = useTypedSelector((state) => state.auth.token);
   const user = useTypedSelector((state) => state.auth.user);
@@ -69,19 +68,34 @@ const AllPosts = ({ searchQuery }: { searchQuery: string }) => {
     }
   }, [inView, hasMore, isLoading]);
 
-  const handleVote = async (id: string, vote: TVote) => {
+ const handleVote = async (id: string, vote: TVote) => {
     if (!user) {
       return toast.error("Please login to vote");
     }
     try {
       const res = await addVote({ id, token, vote });
       if (res.data?.success === true) {
+        updatePostVote(id, vote);
         toast.success("Vote has been done!!");
-        refetch();
       }
     } catch (error) {
       console.log(error);
     }
+  };
+
+  const updatePostVote = (id: string, vote: TVote) => {
+    setPosts((prevPosts) =>
+      prevPosts.map((post) =>
+        post._id === id
+          ? {
+              ...post,
+              upvotes: post.upvotes + (vote.vote === 1 ? 1 : 0),
+              downvotes: post.downvotes + (vote.vote === -1 ? 1 : 0),
+              userVote: vote.vote,
+            }
+          : post
+      )
+    );
   };
 
   const getUserVoteStatus = (voters: any[]) => {
